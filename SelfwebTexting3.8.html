@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<!-- saved from url=(0051)file:///C:/Users/q8972/Desktop/SelfwebTexting2.html -->
+<html lang="zh-CN"><head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// 使用您的配置信息
+const SUPABASE_URL = 'https://hjtxgmlzqmasdgzjpvja.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_n5Fv_PIfuEKm2CnmFZEBOA_AYs1IOJA';
+
+// 初始化 Supabase 客户端
+try {
+    // 检查 supabase 库是否已加载
+    if (typeof supabase === 'undefined') {
+        throw new Error('Supabase JS 库未加载成功');
+    }
+    // 创建客户端并赋给全局变量
+    window.supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('✅ Supabase 客户端初始化成功');
+} catch (error) {
+    console.error('❌ Supabase 初始化失败:', error);
+    // 设置一个空的客户端，以便后续代码不会因为window.supabase未定义而报错
+    window.supabase = null;
+}
+</script>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RB/Tisir_R的个人网页(TEXTING)</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .avatar-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid white;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .avatar:hover {
+            transform: scale(1.05);
+        }
+        
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .avatar-edit-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .avatar-container:hover .avatar-edit-overlay {
+            opacity: 1;
+        }
+        
+        h1 {
+            margin: 0 0 10px;
+            font-size: 2.5em;
+        }
+        
+        .tagline {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .section {
+            margin: 30px 0;
+            padding: 25px;
+            border-left: 4px solid #667eea;
+            background: #f9f9f9;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        h2 {
+            color: #667eea;
+            margin-top: 0;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .skill {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: transform 0.3s;
+        }
+        
+        .skill:hover {
+            transform: translateY(-3px);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            color: #666;
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh; /* 限制最大高度 */
+            overflow-y: auto; /* 添加滚动条 */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, textarea {
+            width: calc(100% - 22px); /* 考虑padding和border */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+            box-sizing: border-box; /* 重要：包含padding和border在宽度内 */
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+            box-sizing: border-box; /* 确保按钮宽度计算一致 */
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 10px auto;
+            display: block;
+            border: 2px solid #667eea;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-input-btn {
+            display: block;
+            padding: 10px;
+            background: #f8f9fa;
+            border: 1px dashed #667eea;
+            border-radius: 5px;
+            text-align: center;
+            color: #667eea;
+            cursor: pointer;
+        }
+        
+        .status-message {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: center;
+            display: none;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 10px;
+            }
+            
+            header {
+                padding: 20px 0;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .avatar {
+                width: 120px;
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="avatar-container">
+                <div class="avatar" id="avatarDisplay"><img src="" alt="个人头像"></div>
+                <div class="avatar-edit-overlay" onclick="openPasswordModal('avatar')">
+                    <span>修改头像</span>
+                </div>
+            </div>
+            <h1 id="displayName">RB/Tisir_R</h1>
+            <p class="tagline" id="displayTagline">软件工程专业学生</p>
+        </header>
+        
+        <section class="section">
+            <h2>关于我</h2>
+            <p id="displayAbout">Seriously?Does any one will really read this?
+Painting,photographing,gaming,make videos&amp;try some thing new.</p>
+        </section>
+        
+        <section class="section">
+            <h2>教育背景</h2>
+            <p id="displayEducation"><strong>HLJUniversity</strong> - 软件工程专业 (2025-2029)</p>
+            <p>主修课程：C语言程序设计</p>
+        </section>
+        
+        <section class="section">
+            <h2>我的技能</h2>
+            <div class="skills" id="displaySkills"><div class="skill">吃饭</div><div class="skill">睡觉</div><div class="skill">玩游戏</div><div class="skill">聊天</div><div class="skill">摆弄AI</div><div class="skill">Photoshop</div></div>
+        </section>
+        
+        <section class="section">
+            <h2>我的项目</h2>
+            <div id="displayProjects"><div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 5px;">
+                    <h3 style="margin-top: 0; color: #667eea;">主要活跃平台</h3>
+                    <p style="margin-bottom: 0;">微信，QQ，哔哩哔哩-Bilibili</p>
+                </div><div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 5px;">
+                    <h3 style="margin-top: 0; color: #667eea;">个人博客网站</h3>
+                    <p style="margin-bottom: 0;">哔哩哔哩 - https://b23.tv/aVa0VJY</p>
+                </div><div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 5px;">
+                    <h3 style="margin-top: 0; color: #667eea;">X</h3>
+                    <p style="margin-bottom: 0;">Tisir_R酞绥(@boringdiscover)：https://x.com/boringdiscover?t=r8mNBLzqwph4bi3aC2yG8w&amp;s=05</p>
+                </div><div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 5px;">
+                    <h3 style="margin-top: 0; color: #667eea;">Pixiv</h3>
+                    <p style="margin-bottom: 0;">Tisir_R（酞绥）https://www.pixiv.net/users/103936220</p>
+                </div><div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 5px;">
+                    <h3 style="margin-top: 0; color: #667eea;">Github</h3>
+                    <p style="margin-bottom: 0;">https://github.com/TisirR</p>
+                </div></div>
+        </section>
+        
+        <section class="section">
+            <h2>联系方式</h2>
+            <div id="displayContact"><p>📧 邮箱：q8972111@gmail.com &amp; qtaisui8972111@163.com</p><p>💬 微信：q8972111</p><p>🐧 QQ：8972111</p><p>✨ X：@boringdiscover</p><p>📱 个人电话：+86 13763666360</p></div>
+        </section>
+        
+        <section class="section">
+            <h2>网站设置</h2>
+            <p>你可以随时修改网站内容，所有更改会自动保存。</p >
+            <button class="btn" onclick="openPasswordModal('edit')">编辑全部内容</button>
+        </section>
+        
+        <footer>
+            <p>© 2025 我的个人网页 | 最后更新: <span id="last_updated">2025/11/26</span></p>
+        </footer>
+    </div>
+
+    <!-- 头像编辑模态框 -->
+    <div id="avatarModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>修改头像</h3>
+                <button class="close-btn" onclick="closeAvatarModal()">×</button>
+            </div>
+            <div class="form-group">
+                <label>选择新头像:</label>
+                <div class="file-input-wrapper">
+                    <div class="file-input-btn">点击选择图片文件</div>
+                    <input type="file" id="avatarUpload" accept="image/*">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>头像预览:</label>
+                <img id="avatarPreview" class="avatar-preview" src="" alt="头像预览">
+            </div>
+            <div id="avatarStatus" class="status-message"></div>
+            <button class="btn btn-block" onclick="uploadAvatar()">更新头像</button>
+        </div>
+    </div>
+
+    <!-- 密码验证模态框 -->
+    <div id="passwordModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 350px;">
+            <div class="modal-header">
+                <h3>请输入编辑密码</h3>
+                <button class="close-btn" onclick="closePasswordModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>密码:</label>
+                <input type="password" id="passwordInput" placeholder="请输入密码">
+            </div>
+            <div id="passwordStatus" class="status-message"></div>
+            <button class="btn btn-block" onclick="verifyPassword()">确认</button>
+        </div>
+    </div>
+
+    <!-- 内容编辑模态框 -->
+    <div id="editModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>编辑网站内容</h3>
+                <button class="close-btn" onclick="closeEditModal()">×</button>
+            </div>
+            <div class="form-group">
+                <label>姓名:</label>
+                <input type="text" id="editName" placeholder="你的姓名">
+            </div>
+            <div class="form-group">
+                <label>个人简介:</label>
+                <input type="text" id="editTagline" placeholder="个人简介/职业">
+            </div>
+            <div class="form-group">
+                <label>个签:</label>
+                <textarea id="editAbout" placeholder="展现你的个性信息" style="height: 30px;"></textarea>
+            </div>
+            <div class="form-group">
+                <label>教育背景:</label>
+                <textarea id="editEducation" placeholder="教育背景信息" style="height: 45px;"></textarea>
+            </div>
+            <div class="form-group">
+                <label>技能 (用逗号分隔):</label>
+                <input type="text" id="editSkills" placeholder="例如: HTML, CSS, JavaScript">
+            </div>
+            <div class="form-group">
+                <label>项目 (每行一个项目):</label>
+                <textarea id="editProjects" placeholder="项目名称 - 项目描述" style="height: 58px;"></textarea>
+            </div>
+            <div class="form-group">
+                <label>联系方式 (每行一个):</label>
+                <textarea id="editContact" placeholder="例如: 邮箱: example@email.com" style="height: -6px;"></textarea>
+            </div>
+            <div id="editStatus" class="status-message status-success" style="display: none;">所有更改已保存!</div>
+            <button class="btn btn-block" onclick="saveChanges()">保存所有更改</button>
+        </div>
+    </div>
+
+    <script>
+
+        // 密码设置
+        const EDIT_PASSWORD = "564646"; // 你可以修改这个密码
+
+        // 默认数据
+        const defaultData = {
+            name: "张三",
+            tagline: "计算机专业学生 | 网页开发学习者",
+            about: "我是一名对编程充满热情的计算机专业大学生。目前正在学习网页开发、数据结构和各种编程语言。我相信技术能够改变世界，希望通过学习不断提升自己。",
+            education: "某某大学 - 计算机科学与技术专业 (2022-2026)",
+            skills: ["C语言", "HTML/CSS", "JavaScript", "Python", "Photoshop", "数据结构"],
+            projects: [
+                { title: "学生成绩管理系统", description: "使用C语言开发的控制台应用程序，实现了学生信息的增删改查、成绩统计和排序功能。" },
+                { title: "个人博客网站", description: "使用HTML、CSS和JavaScript创建的响应式个人博客网站，适配手机和电脑端。" },
+                { title: "计算器应用", description: "基于JavaScript开发的网页计算器，支持基本数学运算和界面交互。" }
+            ],
+            contact: [
+                "📧 邮箱: zhangsan@example.com",
+                "📱 微信: zhangsan123",
+                "🐱 GitHub: zhangsan-github"
+            ],
+            avatar: null, // 初始没有头像，使用默认
+            last_updated: new Date().toLocaleDateString('zh-CN')
+        };
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            document.getElementById('last_updated').textContent = new Date().toLocaleDateString('zh-CN');
+
+            // 监听密码输入框的Enter键
+            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    verifyPassword();
+                }
+            });
+        });
+
+        // 从数据库加载数据 - 优化版
+        async function loadData() {
+            try {
+                console.log('正在从Supabase加载数据...');
+                
+                // 从Supabase读取数据
+                const { data, error } = await window.supabase
+                    .from('website_data')
+                    .select('*')
+                    .eq('id', 1)
+                    .single();
+                    
+                if (error) {
+                    console.log('从数据库加载失败，使用本地数据:', error);
+                    // 降级到本地存储
+                    const savedData = localStorage.getItem('personalWebsiteData');
+                    const data = savedData ? JSON.parse(savedData) : defaultData;
+                    updatePageWithData(data);
+                    return;
+                }
+                
+                if (data) {
+                    console.log('从数据库加载数据成功');
+                    updatePageWithData(data);
+                    
+                    // 保存到本地存储但不包含大尺寸的头像数据
+                    const dataForLocalStorage = { ...data };
+                    if (dataForLocalStorage.avatar && dataForLocalStorage.avatar.length > 10000) {
+                        console.log('头像数据过大，不在本地存储保存');
+                        delete dataForLocalStorage.avatar;
+                    }
+                    localStorage.setItem('personalWebsiteData', JSON.stringify(dataForLocalStorage));
+                } else {
+                    console.log('数据库中没有数据，使用默认数据');
+                    updatePageWithData(defaultData);
+                }
+            } catch (error) {
+                console.log('加载错误，使用本地数据:', error);
+                const savedData = localStorage.getItem('personalWebsiteData');
+                const data = savedData ? JSON.parse(savedData) : defaultData;
+                updatePageWithData(data);
+            }
+        }
+
+        // 用数据更新页面
+        function updatePageWithData(data) {
+            // 更新页面显示
+            document.getElementById('displayName').textContent = data.name;
+            document.getElementById('displayTagline').textContent = data.tagline;
+            document.getElementById('displayAbout').textContent = data.about;
+            document.getElementById('displayEducation').innerHTML = `<strong>${data.education.split(' - ')[0]}</strong> - ${data.education.split(' - ')[1]}`;
+            
+            // 更新技能
+            const skillsContainer = document.getElementById('displaySkills');
+            skillsContainer.innerHTML = '';
+            data.skills.forEach(skill => {
+                const skillElement = document.createElement('div');
+                skillElement.className = 'skill';
+                skillElement.textContent = skill;
+                skillsContainer.appendChild(skillElement);
+            });
+            
+            // 更新项目
+            const projectsContainer = document.getElementById('displayProjects');
+            projectsContainer.innerHTML = '';
+            data.projects.forEach(project => {
+                const projectElement = document.createElement('div');
+                projectElement.style.marginBottom = '20px';
+                projectElement.style.padding = '15px';
+                projectElement.style.background = 'white';
+                projectElement.style.borderRadius = '8px';
+                projectElement.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
+                
+                projectElement.innerHTML = `
+                    <h3 style="margin-top: 0; color: #667eea;">${project.title}</h3>
+                    <p style="margin-bottom: 0;">${project.description}</p >
+                `;
+                projectsContainer.appendChild(projectElement);
+            });
+            
+            // 更新联系方式
+            const contactContainer = document.getElementById('displayContact');
+            contactContainer.innerHTML = '';
+            data.contact.forEach(contact => {
+                const contactElement = document.createElement('p');
+                contactElement.textContent = contact;
+                contactContainer.appendChild(contactElement);
+            });
+            
+            // 更新头像
+            updateAvatarDisplay(data.avatar);
+            
+            // 填充编辑表单
+            document.getElementById('editName').value = data.name;
+            document.getElementById('editTagline').value = data.tagline;
+            document.getElementById('editAbout').value = data.about;
+            document.getElementById('editEducation').value = data.education;
+            document.getElementById('editSkills').value = data.skills.join(', ');
+            document.getElementById('editProjects').value = data.projects.map(p => `${p.title} - ${p.description}`).join('\n');
+            document.getElementById('editContact').value = data.contact.join('\n');
+        }
+
+        // 更新头像显示 - 修复版本
+        function updateAvatarDisplay(avatarData) {
+            const avatarDisplay = document.getElementById('avatarDisplay');
+            const avatarPreview = document.getElementById('avatarPreview');
+            
+            console.log('updateAvatarDisplay 被调用，数据长度:', avatarData ? avatarData.length : 0);
+            console.log('数据类型:', typeof avatarData);
+            if (avatarData) {
+                console.log('数据前50字符:', avatarData.substring(0, 50));
+            }
+            
+            // 清空现有内容
+            avatarDisplay.innerHTML = '';
+            
+            // 检查数据有效性
+            if (!avatarData || 
+                avatarData === 'null' || 
+                avatarData === 'NULL' || 
+                avatarData === '' ||
+                typeof avatarData !== 'string') {
+                console.log('头像数据为空或无效，显示默认头像');
+                showDefaultAvatar(avatarDisplay, avatarPreview);
+                return;
+            }
+            
+            // 检查是否是 HTML 代码（错误情况）
+            if (avatarData.includes('<img') || avatarData.includes('style=') || avatarData.includes('alt=')) {
+                console.error('❌ 错误：头像数据包含 HTML 代码');
+                console.log('错误数据:', avatarData);
+                showDefaultAvatar(avatarDisplay, avatarPreview);
+                return;
+            }
+            
+            // 检查是否是有效的 Base64 图片数据
+            if (avatarData.startsWith('data:image')) {
+                console.log('✅ 显示有效的 Base64 头像');
+                
+                // 创建 img 元素
+                const img = document.createElement('img');
+                img.src = avatarData;
+                img.alt = '个人头像';
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '50%';
+                
+                // 直接添加到 DOM，不要使用 innerHTML
+                avatarDisplay.appendChild(img);
+                
+                if (avatarPreview) {
+                    avatarPreview.src = avatarData;
+                }
+            } else {
+                console.log('ℹ️ 使用默认头像，数据格式不支持:', avatarData.substring(0, 50));
+                showDefaultAvatar(avatarDisplay, avatarPreview);
+            }
+        }
+
+        // 显示默认头像的辅助函数
+        function showDefaultAvatar(avatarDisplay, avatarPreview) {
+            avatarDisplay.innerHTML = `
+                <div style="width:100%;height:100%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;border-radius:50%;">
+                    头像
+                </div>
+            `;
+            if (avatarPreview) {
+                avatarPreview.src = '';
+            }
+        }
+
+        // 打开头像编辑模态框
+        function openAvatarModal() {
+            document.getElementById('avatarModal').style.display = 'flex';
+            
+            // 设置文件选择事件
+            document.getElementById('avatarUpload').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                if (!file.type.match('image.*')) {
+                    showStatus('avatarStatus', '请选择图片文件!', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatarPreview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 关闭头像编辑模态框
+        function closeAvatarModal() {
+            document.getElementById('avatarModal').style.display = 'none';
+            document.getElementById('avatarUpload').value = '';
+            hideStatus('avatarStatus');
+        }
+
+        // 优化版上传头像 - 不在本地存储 Base64 数据
+        async function uploadAvatar() {
+            const fileInput = document.getElementById('avatarUpload');
+            if (!fileInput.files[0]) {
+                showStatus('avatarStatus', '请先选择图片文件!', 'error');
+                return;
+            }
+            
+            // 检查文件大小（限制在 1MB 以内）
+            const file = fileInput.files[0];
+            if (file.size > 1024 * 1024) {
+                showStatus('avatarStatus', '图片文件太大，请选择小于 1MB 的图片!', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const avatarData = e.target.result;
+                
+                console.log('头像数据大小:', avatarData.length, '字符');
+                
+                try {
+                    // 直接保存到 Supabase，不先更新本地存储
+                    const { data: currentData, error: fetchError } = await window.supabase
+                        .from('website_data')
+                        .select('*')
+                        .eq('id', 1)
+                        .single();
+                        
+                    if (fetchError) throw fetchError;
+                    
+                    const updateData = {
+                        ...currentData,
+                        avatar: avatarData,
+                        last_updated: new Date().toISOString()
+                    };
+                    
+                    // 保存到 Supabase
+                    const { error } = await window.supabase
+                        .from('website_data')
+                        .upsert(updateData);
+                        
+                    if (error) throw error;
+                    
+                    console.log('✅ 头像已保存到Supabase');
+                    
+                    // 更新页面显示，但不在本地存储保存 Base64 数据
+                    updateAvatarDisplay(avatarData);
+                    document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString('zh-CN');
+                    
+                    // 更新本地存储，但不包含头像数据
+                    const dataForLocalStorage = { ...updateData };
+                    delete dataForLocalStorage.avatar; // 移除头像数据
+                    localStorage.setItem('personalWebsiteData', JSON.stringify(dataForLocalStorage));
+                    
+                    showStatus('avatarStatus', '头像更新成功!', 'success');
+                    
+                    // 1秒后关闭模态框
+                    setTimeout(() => {
+                        closeAvatarModal();
+                    }, 1000);
+                    
+                } catch (error) {
+                    console.error('保存头像到数据库失败:', error);
+                    showStatus('avatarStatus', '头像保存到云端失败', 'error');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 打开密码验证模态框
+        function openPasswordModal(type) {
+            window.passwordFor = type || 'edit'; // 默认为编辑内容
+            document.getElementById('passwordModal').style.display = 'flex';
+            document.getElementById('passwordInput').focus();
+        }
+
+        // 关闭密码验证模态框
+        function closePasswordModal() {
+           document.getElementById('passwordModal').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
+            hideStatus('passwordStatus');
+        }
+
+        // 验证密码
+        function verifyPassword() {
+           const password = document.getElementById('passwordInput').value;
+
+            if (password === EDIT_PASSWORD) {
+                closePasswordModal();
+                // 检查是编辑内容还是编辑头像
+                if (window.passwordFor === 'avatar') {
+                    openAvatarModal();
+                } else {
+                    openEditModal();
+                }
+            } else {
+                showStatus('passwordStatus', '密码错误，请重试!', 'error');
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+            }
+        }
+
+        // 打开内容编辑模态框
+        function openEditModal() {
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        // 关闭内容编辑模态框
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            hideStatus('editStatus');
+        }
+
+        // 保存所有更改 - 优化版（避免存储配额超限）
+        async function saveChanges() {
+            // 获取表单数据
+            const name = document.getElementById('editName').value;
+            const tagline = document.getElementById('editTagline').value;
+            const about = document.getElementById('editAbout').value;
+            const education = document.getElementById('editEducation').value;
+            const skills = document.getElementById('editSkills').value.split(',').map(s => s.trim()).filter(s => s);
+            const projectsText = document.getElementById('editProjects').value;
+            const contact = document.getElementById('editContact').value.split('\n').filter(c => c.trim());
+            
+            // 解析项目
+            const projects = [];
+            if (projectsText) {
+                projectsText.split('\n').forEach(line => {
+                    const parts = line.split(' - ');
+                    if (parts.length >= 2) {
+                        projects.push({
+                            title: parts[0].trim(),
+                            description: parts.slice(1).join(' - ').trim()
+                        });
+                    } else if (line.trim()) {
+                        projects.push({
+                            title: line.trim(),
+                            description: '项目描述'
+                        });
+                    }
+                });
+            }
+            
+            // 获取当前数据但不包含大尺寸的头像
+            const savedData = localStorage.getItem('personalWebsiteData');
+            const currentData = savedData ? JSON.parse(savedData) : defaultData;
+            
+            // 创建新数据对象
+            const newData = {
+                name,
+                tagline,
+                about,
+                education,
+                skills,
+                projects: projects.length > 0 ? projects : defaultData.projects,
+                contact: contact.length > 0 ? contact : defaultData.contact,
+                avatar: null, // 不通过文本编辑更新头像
+                last_updated: new Date().toISOString() // 只保留这一个时间戳
+            };
+            
+            try {
+                // 检查 Supabase 是否可用
+                if (!window.supabase || typeof window.supabase.from !== 'function') {
+                    throw new Error('Supabase 客户端不可用');
+                }
+                
+                // 保存到Supabase数据库
+                const { error } = await window.supabase
+                    .from('website_data')
+                    .upsert({ 
+                        id: 1,
+                        ...newData
+                    });
+                    
+                if (error) throw error;
+                
+                console.log('数据已保存到Supabase');
+                
+                // 更新本地存储但不包含大尺寸数据
+                localStorage.setItem('personalWebsiteData', JSON.stringify(newData));
+                
+                // 更新页面显示
+                updatePageWithData(newData);
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString('zh-CN');
+                
+                showStatus('editStatus', '数据已保存到云端！', 'success');
+                
+                // 1秒后关闭模态框
+                setTimeout(() => {
+                    closeEditModal();
+                }, 1000);
+                
+            } catch (error) {
+                console.error('保存到数据库失败:', error);
+                // 降级到本地存储
+                localStorage.setItem('personalWebsiteData', JSON.stringify(newData));
+                updatePageWithData(newData);
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString('zh-CN');
+                showStatus('editStatus', '保存到云端失败，已保存到本地', 'error');
+            }
+        }
+
+        // 显示状态消息
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status-message status-${type}`;
+            element.style.display = 'block';
+        }
+
+        // 隐藏状态消息
+        function hideStatus(elementId) {
+            document.getElementById(elementId).style.display = 'none';
+        }
+
+        // 点击模态框外部关闭
+        window.addEventListener('click', function(event) {
+            if (event.target === document.getElementById('avatarModal')) {
+                closeAvatarModal();
+            }
+            if (event.target === document.getElementById('editModal')) {
+                closeEditModal();
+            }
+            if (event.target === document.getElementById('passwordModal')) {
+                closePasswordModal();
+            }
+        });
+    </script>
+
+</body></html>
