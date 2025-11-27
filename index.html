@@ -523,6 +523,7 @@ Painting,photographing,gaming,make videos&amp;try some thing new.</p>
         // 初始化页面
         document.addEventListener('DOMContentLoaded', function() {
             loadData();
+            initVisitorCounter();
             document.getElementById('last_updated').textContent = new Date().toLocaleDateString('zh-CN');
 
             // 监听密码输入框的Enter键
