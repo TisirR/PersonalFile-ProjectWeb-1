@@ -2,34 +2,7 @@
 <!-- saved from url=(0051)file:///C:/Users/q8972/Desktop/SelfwebTexting2.html -->
 <html lang="zh-CN"><head>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- 添加 Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-
 <script>
-// Firebase 配置
-const firebaseConfig = {
-    apiKey: "AIzaSyD4v8v9tX6--UQmMh3uWFNLzOgBQG7aVrg",
-    authDomain: "personal-website-guestbook.firebaseapp.com",
-    projectId: "personal-website-guestbook",
-    storageBucket: "personal-website-guestbook.appspot.com",
-    messagingSenderId: "10261722442627",
-    appId: "1:10261722442627:web:dad44831493bd681dc31e",
-    measurementId: "G-KTCMHW475P"
-};
-
-// 初始化 Firebase
-try {
-    if (typeof firebase !== 'undefined') {
-        firebase.initializeApp(firebaseConfig);
-        console.log('✅ Firebase 初始化成功');
-    } else {
-        console.error('❌ Firebase 库未加载成功');
-    }
-} catch (error) {
-    console.error('❌ Firebase 初始化失败:', error);
-}
 // 使用您的配置信息
 const SUPABASE_URL = 'https://hjtxgmlzqmasdgzjpvja.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_n5Fv_PIfuEKm2CnmFZEBOA_AYs1IOJA';
