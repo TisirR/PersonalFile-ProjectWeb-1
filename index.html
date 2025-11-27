@@ -27,6 +27,22 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RB/Tisir_R的个人网页(TEXTING)</title>
     <style>
+
+        .visitor-counter {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            color: #666;
+            font-size: 0.9em;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            display: inline-block;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
         body {
             font-family: 'Microsoft YaHei', sans-serif;
             margin: 0;
@@ -557,6 +573,31 @@ Painting,photographing,gaming,make videos&amp;try some thing new.</p>
             }
         }
 
+                // 访客计数器功能
+                    function initVisitorCounter() {
+                // 获取当前计数
+                    let count = parseInt(localStorage.getItem('visitorCount') || '0');
+                
+                // 增加计数
+                    count++;
+                
+                // 保存到本地存储
+                    localStorage.setItem('visitorCount', count.toString());
+                
+                // 更新显示
+                    const counterElement = document.getElementById('visitorCount');
+                    if (counterElement) {
+                        counterElement.textContent = count;
+                    }
+                
+                    console.log(`访客计数: ${count}`);
+                }
+            
+            // 在页面加载时初始化计数器
+            document.addEventListener('DOMContentLoaded', function() {
+                initVisitorCounter();
+            });
+
         // 用数据更新页面
         function updatePageWithData(data) {
             // 更新页面显示
@@ -948,5 +989,11 @@ Painting,photographing,gaming,make videos&amp;try some thing new.</p>
             }
         });
     </script>
+
+        <!-- 访客计数器 -->
+    <div class="visitor-counter">
+        <span>👤 访客计数: </span>
+        <span id="visitorCount">0</span>
+    </div>
 
 </body></html>
