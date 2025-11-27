@@ -542,13 +542,9 @@ Painting,photographing,gaming,make videos&amp;try some thing new.</p>
                     console.log('从数据库加载数据成功');
                     updatePageWithData(data);
                     
-                    // 保存到本地存储但不包含大尺寸的头像数据
-                    const dataForLocalStorage = { ...data };
-                    if (dataForLocalStorage.avatar && dataForLocalStorage.avatar.length > 10000) {
-                        console.log('头像数据过大，不在本地存储保存');
-                        delete dataForLocalStorage.avatar;
-                    }
-                    localStorage.setItem('personalWebsiteData', JSON.stringify(dataForLocalStorage));
+                // 保存到本地存储，包含完整的头像数据
+                const dataForLocalStorage = { ...data };
+                localStorage.setItem('personalWebsiteData', JSON.stringify(dataForLocalStorage));
                 } else {
                     console.log('数据库中没有数据，使用默认数据');
                     updatePageWithData(defaultData);
@@ -623,7 +619,10 @@ Painting,photographing,gaming,make videos&amp;try some thing new.</p>
         function updateAvatarDisplay(avatarData) {
             const avatarDisplay = document.getElementById('avatarDisplay');
             const avatarPreview = document.getElementById('avatarPreview');
-            
+
+            // 保存头像数据到全局变量
+            window.currentAvatar = avatarData;
+    
             console.log('updateAvatarDisplay 被调用，数据长度:', avatarData ? avatarData.length : 0);
             
             // 清空现有内容
@@ -763,9 +762,11 @@ Painting,photographing,gaming,make videos&amp;try some thing new.</p>
                     updateAvatarDisplay(avatarData);
                     document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString('zh-CN');
                     
-                    // 更新本地存储，但不包含头像数据
+                    // 更新本地存储，但不包含大尺寸头像数据
                     const dataForLocalStorage = { ...updateData };
-                    delete dataForLocalStorage.avatar; // 移除头像数据
+                    if (dataForLocalStorage.avatar) {
+                        delete dataForLocalStorage.avatar; // 确保大头像的数据也会是完整的
+                    }
                     localStorage.setItem('personalWebsiteData', JSON.stringify(dataForLocalStorage));
                     
                     showStatus('avatarStatus', '头像更新成功!', 'success');
@@ -891,8 +892,13 @@ Painting,photographing,gaming,make videos&amp;try some thing new.</p>
                 
                 console.log('数据已保存到Supabase');
                 
-                // 更新本地存储但不包含大尺寸数据
-                localStorage.setItem('personalWebsiteData', JSON.stringify(newData));
+                // 更新本地存储，包含完整的头像数据
+                const dataForLocalStorage = { ...newData };
+                // 确保包含当前的头像数据，不限制大小
+                if (window.currentAvatar) {
+                    dataForLocalStorage.avatar = window.currentAvatar;
+                }
+                localStorage.setItem('personalWebsiteData', JSON.stringify(dataForLocalStorage));
                 
                 // 更新页面显示
                 updatePageWithData(newData);
