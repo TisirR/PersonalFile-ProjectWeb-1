@@ -625,10 +625,6 @@ Painting,photographing,gaming,make videos&amp;try some thing new.</p>
             const avatarPreview = document.getElementById('avatarPreview');
             
             console.log('updateAvatarDisplay 被调用，数据长度:', avatarData ? avatarData.length : 0);
-            console.log('数据类型:', typeof avatarData);
-            if (avatarData) {
-                console.log('数据前50字符:', avatarData.substring(0, 50));
-            }
             
             // 清空现有内容
             avatarDisplay.innerHTML = '';
@@ -647,7 +643,6 @@ Painting,photographing,gaming,make videos&amp;try some thing new.</p>
             // 检查是否是 HTML 代码（错误情况）
             if (avatarData.includes('<img') || avatarData.includes('style=') || avatarData.includes('alt=')) {
                 console.error('❌ 错误：头像数据包含 HTML 代码');
-                console.log('错误数据:', avatarData);
                 showDefaultAvatar(avatarDisplay, avatarPreview);
                 return;
             }
@@ -665,14 +660,14 @@ Painting,photographing,gaming,make videos&amp;try some thing new.</p>
                 img.style.objectFit = 'cover';
                 img.style.borderRadius = '50%';
                 
-                // 直接添加到 DOM，不要使用 innerHTML
+                // 直接添加到 DOM
                 avatarDisplay.appendChild(img);
                 
                 if (avatarPreview) {
                     avatarPreview.src = avatarData;
                 }
             } else {
-                console.log('ℹ️ 使用默认头像，数据格式不支持:', avatarData.substring(0, 50));
+                console.log('ℹ️ 使用默认头像，数据格式不支持');
                 showDefaultAvatar(avatarDisplay, avatarPreview);
             }
         }
