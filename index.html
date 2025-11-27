@@ -858,21 +858,22 @@ Painting,photographing,gaming,make videos&amp;try some thing new.</p>
                 });
             }
             
-            // 获取当前数据但不包含大尺寸的头像
-            const savedData = localStorage.getItem('personalWebsiteData');
-            const currentData = savedData ? JSON.parse(savedData) : defaultData;
-            
-            // 创建新数据对象
-            const newData = {
-                name,
-                tagline,
-                about,
-                education,
-                skills,
-                projects: projects.length > 0 ? projects : defaultData.projects,
-                contact: contact.length > 0 ? contact : defaultData.contact,
-                last_updated: new Date().toISOString() // 只保留这一个时间戳
-            };
+                // 获取当前数据但不包含大尺寸的头像
+                const savedData = localStorage.getItem('personalWebsiteData');
+                const currentData = savedData ? JSON.parse(savedData) : defaultData;
+                
+                // 创建新数据对象
+                const newData = {
+                    name,
+                    tagline,
+                    about,
+                    education,
+                    skills,
+                    projects: projects.length > 0 ? projects : defaultData.projects,
+                    contact: contact.length > 0 ? contact : defaultData.contact,
+                    avatar: currentData.avatar, // 保留现有的头像数据
+                    last_updated: new Date().toISOString() // 只保留这一个时间戳
+                };
             
             try {
                 // 检查 Supabase 是否可用
