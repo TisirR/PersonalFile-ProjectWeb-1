@@ -574,28 +574,29 @@ Painting,photographing,gaming,make videos&amp;try some thing new.</p>
             }
         }
 
-                // 访客计数器功能
-                    function initVisitorCounter() {
+            // 访客计数器功能
+            function initVisitorCounter() {
                 // 获取当前计数
-                    let count = parseInt(localStorage.getItem('visitorCount') || '0');
+                let count = parseInt(localStorage.getItem('visitorCount') || '0');
                 
                 // 增加计数
-                    count++;
+                count++;
                 
                 // 保存到本地存储
-                    localStorage.setItem('visitorCount', count.toString());
+                localStorage.setItem('visitorCount', count.toString());
                 
                 // 更新显示
-                    const counterElement = document.getElementById('visitorCount');
-                    if (counterElement) {
-                        counterElement.textContent = count;
-                    }
-                
-                    console.log(`访客计数: ${count}`);
+                const counterElement = document.getElementById('visitorCount');
+                if (counterElement) {
+                    counterElement.textContent = count;
                 }
+                
+                console.log(`访客计数: ${count}`);
+            }
             
             // 在页面加载时初始化计数器
             document.addEventListener('DOMContentLoaded', function() {
+                loadData();
                 initVisitorCounter();
             });
 
