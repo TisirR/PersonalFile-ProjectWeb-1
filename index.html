@@ -546,6 +546,22 @@ try {
                 </button>
             </div>
             <div class="form-group">
+                <label>页面标题设置:</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label style="font-size: 0.9em; color: #666;">正常标题</label>
+                        <input type="text" id="editActiveTitle" placeholder="用户在当前页面时显示">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.9em; color: #666;">休眠标题</label>
+                        <input type="text" id="editInactiveTitle" placeholder="用户离开页面时显示">
+                    </div>
+                </div>
+                <p style="font-size: 0.8em; color: #888; margin-top: 5px;">
+                    当用户切换到其他标签页时，标题会自动切换为"休眠标题"
+                </p >
+            </div>
+            <div class="form-group">
                 <label>联系方式 (每行一个):</label>
                 <textarea id="editContact" placeholder="例如: 邮箱: example@email.com" style="height: -6px;"></textarea>
             </div>
@@ -577,9 +593,30 @@ try {
                 "🐱 GitHub: example-github"
             ],
             avatar: null, // 初始没有头像，使用默认
+            // 添加标题设置
+            activeTitle: "Ciallo～(∠・ω< )⌒★",
+            inactiveTitle: "|´•ω•`)…",
             last_updated: new Date().toLocaleDateString('zh-CN')
         };
 
+        // 标题切换功能 - 使用用户设置的标题
+        let isTabActive = true;
+        
+        // 监听页面可见性变化
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // 页面不可见（切换到其他标签页或最小化）
+                const inactiveTitle = window.currentData?.inactiveTitle || "|´•ω•`)…";
+                document.title = inactiveTitle;
+                isTabActive = false;
+            } else {
+                // 页面可见
+                const activeTitle = window.currentData?.activeTitle || "Ciallo～(∠・ω< )⌒★";
+                document.title = activeTitle;
+                isTabActive = true;
+            }
+        });
+        
         // 初始化页面
         document.addEventListener('DOMContentLoaded', function() {
             loadData();
@@ -823,6 +860,14 @@ try {
             document.getElementById('editSkills').value = data.skills.join(', ');
             populateProjectsInputs(data.projects); // 使用新的填充函数
             document.getElementById('editContact').value = data.contact.join('\n');
+            // 添加标题字段填充
+            document.getElementById('editActiveTitle').value = data.activeTitle || "";
+            document.getElementById('editInactiveTitle').value = data.inactiveTitle || "";
+            // 保存当前数据到全局变量，供标题切换使用
+            window.currentData = data;
+            
+            // 设置初始标题
+            document.title = data.activeTitle || "RB/Tisir_R的个人网页Ver.4.4";
         }
 
         // 更新头像显示 - 修复版本
@@ -1055,7 +1100,10 @@ try {
                 const skills = document.getElementById('editSkills').value.split(',').map(s => s.trim()).filter(s => s);
                 const projects = collectProjectsData(); // 使用新的收集函数
                 const contact = document.getElementById('editContact').value.split('\n').filter(c => c.trim());
-            
+                // 添加标题数据
+                const activeTitle = document.getElementById('editActiveTitle').value;
+                const inactiveTitle = document.getElementById('editInactiveTitle').value;
+                            
                 // 获取当前数据但不包含大尺寸的头像
                 const savedData = localStorage.getItem('personalWebsiteData');
                 const currentData = savedData ? JSON.parse(savedData) : defaultData;
@@ -1070,6 +1118,9 @@ try {
                     projects: projects.length > 0 ? projects : defaultData.projects,
                     contact: contact.length > 0 ? contact : defaultData.contact,
                     avatar: currentData.avatar, // 保留现有的头像数据
+                    // 添加标题数据
+                    activeTitle: activeTitle || defaultData.activeTitle,
+                    inactiveTitle: inactiveTitle || defaultData.inactiveTitle,
                     last_updated: new Date().toISOString() // 只保留这一个时间戳
                 };
             
