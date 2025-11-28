@@ -553,7 +553,7 @@ try {
         // 初始化页面
         document.addEventListener('DOMContentLoaded', function() {
             loadData();
-            initVisitorCounter();
+            updateGlobalVisitorCounter();
             document.getElementById('last_updated').textContent = new Date().toLocaleDateString('zh-CN');
 
             // 监听密码输入框的Enter键
@@ -604,26 +604,54 @@ try {
             }
         }
 
-            // 访客计数器功能
-            function initVisitorCounter() {
-                // 获取当前计数
+                // 全局访客计数器
+            async function updateGlobalVisitorCounter() {
+                try {
+                    // 检查 Supabase 是否可用
+                    if (!window.supabase) {
+                        throw new Error('Supabase 不可用');
+                    }
+            
+                    // 从数据库获取当前计数
+                    const { data, error } = await window.supabase
+                        .from('visitor_counter')
+                        .select('count')
+                        .eq('id', 1)
+                        .single();
+            
+                    if (error) throw error;
+            
+                    let currentCount = data.count;
+                    currentCount++; // 增加计数
+            
+                    // 更新数据库中的计数
+                    const { error: updateError } = await window.supabase
+                        .from('visitor_counter')
+                        .update({ count: currentCount })
+                        .eq('id', 1);
+            
+                    if (updateError) throw updateError;
+            
+                    // 更新页面显示
+                    document.getElementById('visitorCount').textContent = currentCount;
+                    console.log('全局访客计数已更新:', currentCount);
+            
+                } catch (error) {
+                    console.error('更新全局访客计数失败:', error);
+                    // 降级到本地计数
+                    fallbackToLocalCounter();
+                }
+            }
+            
+            // 备用本地计数器
+            function fallbackToLocalCounter() {
                 let count = parseInt(localStorage.getItem('visitorCount') || '0');
-                
-                // 增加计数
                 count++;
-                
-                // 保存到本地存储
                 localStorage.setItem('visitorCount', count.toString());
-                
-                // 更新显示
-                const counterElement = document.getElementById('visitorCount');
-                if (counterElement) {
-                    counterElement.textContent = count;
-                }
-                
-                console.log(`访客计数: ${count}`);
-                }
-
+                document.getElementById('visitorCount').textContent = count;
+                console.log('使用本地访客计数:', count);
+            }
+        
             // 添加新的项目输入框
             function addProjectInput() {
                 const container = document.getElementById('projectsContainer');
