@@ -347,6 +347,19 @@ try {
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+
+        .project-input-group {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+            position: relative;
+        }
+        
+        .project-input-group:first-child .remove-project {
+            display: none !important;
+        }
         
         @media (max-width: 600px) {
             .container {
@@ -489,8 +502,18 @@ try {
                 <input type="text" id="editSkills" placeholder="例如: HTML, CSS, JavaScript">
             </div>
             <div class="form-group">
-                <label>其他信息 (新建气泡框用 - ，换行用"<>里面写br"):</label>
-                <textarea id="editProjects" placeholder="标题 - 内容标题<br>内容" style="height: 40px;"></textarea>
+                <label>其他信息:</label>
+                <div id="projectsContainer">
+                    <!-- 项目输入框将动态添加在这里 -->
+                    <div class="project-input-group">
+                        <input type="text" class="project-title" placeholder="标题 (例如: 主要活跃平台)" style="margin-bottom: 8px; width: 100%; box-sizing: border-box;">
+                        <textarea class="project-description" placeholder="内容描述 (支持换行)" style="height: 60px; margin-bottom: 10px; width: 100%; box-sizing: border-box; resize: vertical;"></textarea>
+                        <button type="button" class="btn btn-secondary remove-project" style="display: none; padding: 5px 10px; font-size: 12px;">删除</button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addProjectInput()" style="margin-top: 10px;">
+                    + 添加新项目
+                </button>
             </div>
             <div class="form-group">
                 <label>联系方式 (每行一个):</label>
@@ -607,6 +630,91 @@ try {
                 initVisitorCounter();
             });
 
+            // 添加新的项目输入框
+            function addProjectInput() {
+                const container = document.getElementById('projectsContainer');
+                const newGroup = document.createElement('div');
+                newGroup.className = 'project-input-group';
+                
+                newGroup.innerHTML = `
+                    <input type="text" class="project-title" placeholder="标题 (例如: 主要活跃平台)" style="margin-bottom: 8px; width: 100%; box-sizing: border-box;">
+                    <textarea class="project-description" placeholder="内容描述 (支持换行)" style="height: 60px; margin-bottom: 10px; width: 100%; box-sizing: border-box; resize: vertical;"></textarea>
+                    <button type="button" class="btn btn-secondary remove-project" onclick="removeProjectInput(this)" style="position: absolute; top: 10px; right: 10px; padding: 5px 10px; font-size: 12px;">删除</button>
+                `;
+                
+                container.appendChild(newGroup);
+            }
+            
+            // 删除项目输入框
+            function removeProjectInput(button) {
+                const group = button.closest('.project-input-group');
+                if (group) {
+                    group.remove();
+                }
+            }
+            
+            // 从输入框收集项目数据
+            function collectProjectsData() {
+                const projectGroups = .querySelectorAll('.project-input-group');
+                const projects = [];
+                
+                projectGroups.forEach(group => {
+                    const titleInput = group.querySelector('.project-title');
+                    const descInput = group.querySelector('.project-description');
+                    
+                    const title = titleInput ? titleInput.value.trim() : '';
+                    const description = descInput ? descInput.value.trim() : '';
+                    
+                    if (title || description) {
+                        projects.push({
+                            title: title || '未命名项目',
+                            description: description || '暂无描述'
+                        });
+                    }
+                });
+                
+                // 如果没有任何项目，返回默认项目
+                return projects.length > 0 ? projects : [{
+                    title: "主要活跃平台",
+                    description: "暂无平台信息"
+                }];
+            }
+            
+            // 用项目数据填充输入框
+            function populateProjectsInputs(projects) {
+                const container = document.getElementById('projectsContainer');
+                if (!container) return;
+                
+                container.innerHTML = ''; // 清空现有内容
+                
+                projects.forEach((project, index) => {
+                    const group = document.createElement('div');
+                    group.className = 'project-input-group';
+                    
+                    const removeButton = index === 0 ? '' : '<button type="button" class="btn btn-secondary remove-project" onclick="removeProjectInput(this)" style="position: absolute; top: 10px; right: 10px; padding: 5px 10px; font-size: 12px;">删除</button>';
+                    
+                    group.innerHTML = `
+                        <input type="text" class="project-title" placeholder="标题" 
+                               value="${escapeHtml(project.title)}" style="margin-bottom: 8px; width: 100%; box-sizing: border-box;">
+                        <textarea class="project-description" placeholder="内容描述" 
+                                  style="height: 80px; margin-bottom: 10px; width: 100%; box-sizing: border-box; resize: vertical;">${escapeHtml(project.description)}</textarea>
+                        ${removeButton}
+                    `;
+                    
+                    container.appendChild(group);
+                });
+            }
+            
+            // HTML转义函数，防止XSS
+            function escapeHtml(unsafe) {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
         // 用数据更新页面
         function updatePageWithData(data) {
             // 更新页面显示
@@ -638,7 +746,7 @@ try {
                 
                 projectElement.innerHTML = `
                     <h3 style="margin-top: 0; color: #667eea;">${project.title}</h3>
-                    <p style="margin-bottom: 0;">${project.description}</p >
+                    <p style="margin-bottom: 0; white-space: pre-line;">${project.description}</p >
                 `;
                 projectsContainer.appendChild(projectElement);
             });
@@ -661,7 +769,7 @@ try {
             document.getElementById('editAbout').value = data.about;
             document.getElementById('editEducation').value = data.education;
             document.getElementById('editSkills').value = data.skills.join(', ');
-            document.getElementById('editProjects').value = data.projects.map(p => `${p.title} - ${p.description}`).join('\n');
+            populateProjectsInputs(data.projects); // 使用新的填充函数
             document.getElementById('editContact').value = data.contact.join('\n');
         }
 
@@ -880,33 +988,15 @@ try {
 
         // 保存所有更改 - 优化版（避免存储配额超限）
         async function saveChanges() {
-            // 获取表单数据
-            const name = document.getElementById('editName').value;
-            const tagline = document.getElementById('editTagline').value;
-            const about = document.getElementById('editAbout').value;
-            const education = document.getElementById('editEducation').value;
-            const skills = document.getElementById('editSkills').value.split(',').map(s => s.trim()).filter(s => s);
-            const projectsText = document.getElementById('editProjects').value;
-            const contact = document.getElementById('editContact').value.split('\n').filter(c => c.trim());
             
-            // 解析项目
-            const projects = [];
-            if (projectsText) {
-                projectsText.split('\n').forEach(line => {
-                    const parts = line.split(' - ');
-                    if (parts.length >= 2) {
-                        projects.push({
-                            title: parts[0].trim(),
-                            description: parts.slice(1).join(' - ').trim()
-                        });
-                    } else if (line.trim()) {
-                        projects.push({
-                            title: line.trim(),
-                            description: '项目描述'
-                        });
-                    }
-                });
-            }
+                // 获取表单数据
+                const name = document.getElementById('editName').value;
+                const tagline = document.getElementById('editTagline').value;
+                const about = document.getElementById('editAbout').value;
+                const education = document.getElementById('editEducation').value;
+                const skills = document.getElementById('editSkills').value.split(',').map(s => s.trim()).filter(s => s);
+                const projects = collectProjectsData(); // 使用新的收集函数
+                const contact = document.getElementById('editContact').value.split('\n').filter(c => c.trim());
             
                 // 获取当前数据但不包含大尺寸的头像
                 const savedData = localStorage.getItem('personalWebsiteData');
