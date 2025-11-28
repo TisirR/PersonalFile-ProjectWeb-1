@@ -622,12 +622,6 @@ try {
                 }
                 
                 console.log(`访客计数: ${count}`);
-            }
-            
-            // 在页面加载时初始化计数器
-            document.addEventListener('DOMContentLoaded', function() {
-                loadData();
-                initVisitorCounter();
             });
 
             // 添加新的项目输入框
@@ -653,10 +647,10 @@ try {
                 }
             }
             
-            // 从输入框收集项目数据
-            function collectProjectsData() {
-                const projectGroups = .querySelectorAll('.project-input-group');
-                const projects = [];
+                // 从输入框收集项目数据
+                function collectProjectsData() {
+                    const projectGroups = document.querySelectorAll('.project-input-group'); // 添加了 document
+                    const projects = [];
                 
                 projectGroups.forEach(group => {
                     const titleInput = group.querySelector('.project-title');
@@ -918,7 +912,7 @@ try {
                     
                     // 更新页面显示，但不在本地存储保存 Base64 数据
                     updateAvatarDisplay(avatarData);
-                    document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString('zh-CN');
+                    document.getElementById('last_updated').textContent = new Date().toLocaleDateString('zh-CN');
                     
                     // 更新本地存储，但不包含大尺寸头像数据
                     const dataForLocalStorage = { ...updateData };
@@ -978,6 +972,12 @@ try {
         // 打开内容编辑模态框
         function openEditModal() {
             document.getElementById('editModal').style.display = 'flex';
+            
+            // 确保至少有一个项目输入框
+            const container = document.getElementById('projectsContainer');
+            if (container && container.children.length === 0) {
+                addProjectInput();
+            }
         }
 
         // 关闭内容编辑模态框
@@ -1043,7 +1043,7 @@ try {
                 
                 // 更新页面显示
                 updatePageWithData(newData);
-                document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString('zh-CN');
+                document.getElementById('last_updated').textContent = new Date().toLocaleDateString('zh-CN');
                 
                 showStatus('editStatus', '数据已保存到云端！', 'success');
                 
@@ -1057,7 +1057,7 @@ try {
                 // 降级到本地存储
                 localStorage.setItem('personalWebsiteData', JSON.stringify(newData));
                 updatePageWithData(newData);
-                document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString('zh-CN');
+                document.getElementById('last_updated').textContent = new Date().toLocaleDateString('zh-CN');
                 showStatus('editStatus', '保存到云端失败，已保存到本地', 'error');
             }
         }
