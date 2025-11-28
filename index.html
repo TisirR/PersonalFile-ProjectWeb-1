@@ -79,6 +79,16 @@ try {
             background: white;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
             border-radius: 10px;
+            /* 添加移动端适配 */
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* 防止文字溢出 */
+        .section p, .section div, #displayContact p {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
         }
         
         header {
@@ -364,7 +374,8 @@ try {
         @media (max-width: 600px) {
             .container {
                 margin: 10px;
-                padding: 10px;
+                padding: 15px;
+                width: calc(100% - 20px); /* 新增：确保不超出屏幕 */
             }
             
             header {
@@ -378,6 +389,25 @@ try {
             .avatar {
                 width: 120px;
                 height: 120px;
+            }
+            
+            /* 新增：防止文字溢出 */
+            .section p, .section div, #displayContact p {
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                white-space: normal;
+                word-break: break-word;
+                max-width: 100%;
+            }
+            
+            /* 新增：修复技能标签换行 */
+            .skills {
+                gap: 5px;
+            }
+            
+            .skill {
+                font-size: 12px;
+                padding: 6px 12px;
             }
         }
     </style>
