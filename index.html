@@ -25,7 +25,7 @@ try {
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RB/Tisir_R的个人网页Ver.4.7(改进中)</title>
+    <title>RB/Tisir_R的个人网页Ver.4.8(改进中)</title>
     
         <!-- 网站头像 -->
     <link rel="apple-touch-icon" sizes="57x57" href="https://raw.githubusercontent.com/TisirR/PersonalFile-ProjectWeb-1/favicons/apple-icon-57x57.png">
@@ -458,6 +458,30 @@ try {
             <h2>网站设置</h2>
             <p>你可以随时修改网站内容，所有更改会自动保存。</p >
             <button class="btn" onclick="openPasswordModal('edit')">编辑全部内容</button>
+        </section>
+
+        <section class="section">
+            <h2>反馈与建议</h2>
+            <p>欢迎提出宝贵意见，帮助我改进网站！</p >
+            
+            <div class="form-group">
+                <label>您的称呼 (可选):</label>
+                <input type="text" id="feedbackName" placeholder="怎么称呼您？" style="width: 100%;">
+            </div>
+            
+            <div class="form-group">
+                <label>邮箱 (可选，用于回复):</label>
+                <input type="email" id="feedbackEmail" placeholder="您的邮箱地址" style="width: 100%;">
+            </div>
+            
+            <div class="form-group">
+                <label>反馈内容:</label>
+                <textarea id="feedbackMessage" placeholder="请详细描述您的建议或遇到的问题..." style="width: 100%; height: 120px;"></textarea>
+            </div>
+            
+            <button class="btn" onclick="submitFeedback()">提交反馈</button>
+            
+            <div id="feedbackStatus" class="status-message" style="display: none;"></div>
         </section>
         
         <footer>
@@ -1186,6 +1210,45 @@ try {
             }
         }
 
+                // 提交反馈到数据库
+        async function submitFeedback() {
+            const name = document.getElementById('feedbackName').value.trim();
+            const email = document.getElementById('feedbackEmail').value.trim();
+            const message = document.getElementById('feedbackMessage').value.trim();
+            
+            // 验证必填字段
+            if (!message) {
+                showStatus('feedbackStatus', '请填写反馈内容!', 'error');
+                return;
+            }
+            
+            try {
+                // 保存到 Supabase
+                const { error } = await window.supabase
+                    .from('feedback')
+                    .insert([
+                        {
+                            name: name || '匿名用户',
+                            email: email || '',
+                            message: message
+                        }
+                    ]);
+                    
+                if (error) throw error;
+                
+                // 清空表单
+                document.getElementById('feedbackName').value = '';
+                document.getElementById('feedbackEmail').value = '';
+                document.getElementById('feedbackMessage').value = '';
+                
+                showStatus('feedbackStatus', '让我看看！😋', 'success');
+                
+            } catch (error) {
+                console.error('提交反馈失败:', error);
+                showStatus('feedbackStatus', '提交失败，请稍后重试!', 'error');
+            }
+        }
+        
         // 显示状态消息
         function showStatus(elementId, message, type) {
             const element = document.getElementById(elementId);
