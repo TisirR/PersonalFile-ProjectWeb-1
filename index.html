@@ -25,7 +25,7 @@ try {
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RB/Tisir_R的个人网页Ver.4.8.2(改进中)</title>
+    <title>RB/Tisir_R的个人网页Ver.4.8.3(改进中)</title>
     
         <!-- 网站头像 -->
     <link rel="apple-touch-icon" sizes="57x57" href="https://raw.githubusercontent.com/TisirR/PersonalFile-ProjectWeb-1/favicons/apple-icon-57x57.png">
@@ -460,6 +460,38 @@ try {
             <button class="btn" onclick="openPasswordModal('edit')">编辑全部内容</button>
         </section>
 
+        <!-- 反馈管理模块 -->
+        <section class="section">
+            <h2>反馈管理</h2>
+            
+            <!-- 反馈统计 -->
+            <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                <div class="feedback-stat" style="background: #e3f2fd; padding: 15px; border-radius: 8px; min-width: 120px;">
+                    <div style="font-size: 0.9em; color: #1976d2;">待处理反馈</div>
+                    <div id="pendingCount" style="font-size: 1.5em; font-weight: bold; color: #1976d2;">0</div>
+                </div>
+                <div class="feedback-stat" style="background: #e8f5e8; padding: 15px; border-radius: 8px; min-width: 120px;">
+                    <div style="font-size: 0.9em; color: #2e7d32;">已处理反馈</div>
+                    <div id="processedCount" style="font-size: 1.5em; font-weight: bold; color: #2e7d32;">0</div>
+                </div>
+                <div class="feedback-stat" style="background: #f3e5f5; padding: 15px; border-radius: 8px; min-width: 120px;">
+                    <div style="font-size: 0.9em; color: #7b1fa2;">总反馈数</div>
+                    <div id="totalCount" style="font-size: 1.5em; font-weight: bold; color: #7b1fa2;">0</div>
+                </div>
+            </div>
+            
+            <!-- 反馈列表 -->
+            <div id="feedbackList" style="max-height: 400px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; background: #fafafa;">
+                <p style="text-align: center; color: #666;">加载反馈中...</p >
+            </div>
+            
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                <button class="btn" onclick="loadFeedback()">刷新反馈列表</button>
+                <button class="btn btn-secondary" onclick="showOnlyPending()">只看待处理</button>
+                <button class="btn btn-secondary" onclick="showAllFeedback()">显示全部</button>
+            </div>
+        </section>
+
         <section class="section">
             <h2>反馈与建议</h2>
             <p>欢迎提出宝贵意见，帮助我改进网站！</p >
@@ -645,6 +677,7 @@ try {
         document.addEventListener('DOMContentLoaded', function() {
             loadData();
             updateVisitorStats();
+            loadFeedbackStats();
             document.getElementById('last_updated').textContent = new Date().toLocaleDateString('zh-CN');
 
             // 监听密码输入框的Enter键
@@ -1359,6 +1392,7 @@ try {
                     document.getElementById('feedbackMessage').value = '';
                     
                     showStatus('feedbackStatus', '我晚点就去Supabase上康康😋', 'success');
+                    loadFeedbackStats();
                     
                     // 恢复按钮状态
                     submitBtn.textContent = originalText;
@@ -1383,6 +1417,224 @@ try {
                     }, 3000);
                 }
             }
+
+            // 反馈管理功能
+            let currentFeedbackFilter = 'all';
+            
+            // 加载反馈统计
+            async function loadFeedbackStats() {
+                try {
+                    if (!window.supabase) {
+                        throw new Error('Supabase 不可用');
+                    }
+            
+                    // 获取待处理反馈数量
+                    const { data: pendingData, error: pendingError } = await window.supabase
+                        .from('feedback')
+                        .select('id', { count: 'exact' })
+                        .eq('status', 'pending');
+            
+                    if (pendingError) throw pendingError;
+            
+                    // 获取已处理反馈数量
+                    const { data: processedData, error: processedError } = await window.supabase
+                        .from('feedback')
+                        .select('id', { count: 'exact' })
+                        .eq('status', 'processed');
+            
+                    if (processedError) throw processedError;
+            
+                    // 获取总反馈数量
+                    const { data: totalData, error: totalError } = await window.supabase
+                        .from('feedback')
+                        .select('id', { count: 'exact' });
+            
+                    if (totalError) throw totalError;
+            
+                    // 更新统计显示
+                    document.getElementById('pendingCount').textContent = pendingData.length || 0;
+                    document.getElementById('processedCount').textContent = processedData.length || 0;
+                    document.getElementById('totalCount').textContent = totalData.length || 0;
+            
+                } catch (error) {
+                    console.error('加载反馈统计失败:', error);
+                }
+            }
+            
+            // 加载反馈列表
+            async function loadFeedback() {
+                try {
+                    if (!window.supabase) {
+                        throw new Error('Supabase 不可用');
+                    }
+            
+                    let query = window.supabase
+                        .from('feedback')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+            
+                    // 应用过滤器
+                    if (currentFeedbackFilter === 'pending') {
+                        query = query.eq('status', 'pending');
+                    }
+            
+                    const { data: feedbacks, error } = await query;
+            
+                    if (error) throw error;
+            
+                    displayFeedbackList(feedbacks || []);
+            
+                } catch (error) {
+                    console.error('加载反馈列表失败:', error);
+                    document.getElementById('feedbackList').innerHTML = '<p style="text-align: center; color: #d32f2f;">加载失败，请重试</p >';
+                }
+            }
+            
+            // 显示反馈列表
+            function displayFeedbackList(feedbacks) {
+                const container = document.getElementById('feedbackList');
+                
+                if (feedbacks.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #666;">暂无反馈</p >';
+                    return;
+                }
+            
+                let html = '';
+                feedbacks.forEach(feedback => {
+                    const date = new Date(feedback.created_at).toLocaleString('zh-CN');
+                    const statusClass = feedback.status === 'processed' ? 'feedback-item-processed' : 'feedback-item-pending';
+                    const statusText = feedback.status === 'processed' ? '已处理' : '待处理';
+                    
+                    html += `
+                        <div class="feedback-item ${statusClass}" style="
+                            background: white; 
+                            padding: 15px; 
+                            margin-bottom: 10px; 
+                            border-radius: 8px; 
+                            border-left: 4px solid ${feedback.status === 'processed' ? '#4caf50' : '#ff9800'};
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                        ">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                                <div>
+                                    <strong>${feedback.name || '匿名用户'}</strong>
+                                    ${feedback.email ? `<span style="color: #666; margin-left: 10px;">${feedback.email}</span>` : ''}
+                                </div>
+                                <div style="display: flex; gap: 5px; align-items: center;">
+                                    <span class="feedback-status" style="
+                                        background: ${feedback.status === 'processed' ? '#e8f5e8' : '#fff3e0'};
+                                        color: ${feedback.status === 'processed' ? '#2e7d32' : '#ef6c00'};
+                                        padding: 2px 8px;
+                                        border-radius: 12px;
+                                        font-size: 0.8em;
+                                    ">${statusText}</span>
+                                    <span style="color: #999; font-size: 0.9em;">${date}</span>
+                                </div>
+                            </div>
+                            <div style="color: #333; line-height: 1.5; margin-bottom: 10px;">${feedback.message}</div>
+                            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                                ${feedback.status === 'pending' ? `
+                                    <button class="btn" onclick="markAsProcessed(${feedback.id})" style="padding: 5px 10px; font-size: 0.8em;">标记为已处理</button>
+                                ` : `
+                                    <button class="btn btn-secondary" onclick="markAsPending(${feedback.id})" style="padding: 5px 10px; font-size: 0.8em;">标记为待处理</button>
+                                `}
+                                <button class="btn btn-secondary" onclick="deleteFeedback(${feedback.id})" style="padding: 5px 10px; font-size: 0.8em; background: #f44336;">删除</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            
+                container.innerHTML = html;
+            }
+            
+            // 标记反馈为已处理
+            async function markAsProcessed(feedbackId) {
+                if (!confirm('确定标记为已处理吗？')) return;
+            
+                try {
+                    const { error } = await window.supabase
+                        .from('feedback')
+                        .update({ 
+                            status: 'processed',
+                            processed_at: new Date().toISOString()
+                        })
+                        .eq('id', feedbackId);
+            
+                    if (error) throw error;
+            
+                    // 重新加载统计和列表
+                    loadFeedbackStats();
+                    loadFeedback();
+                    
+                    alert('反馈已标记为已处理');
+            
+                } catch (error) {
+                    console.error('标记反馈失败:', error);
+                    alert('操作失败，请重试');
+                }
+            }
+            
+            // 标记反馈为待处理
+            async function markAsPending(feedbackId) {
+                if (!confirm('确定标记为待处理吗？')) return;
+            
+                try {
+                    const { error } = await window.supabase
+                        .from('feedback')
+                        .update({ 
+                            status: 'pending',
+                            processed_at: null
+                        })
+                        .eq('id', feedbackId);
+            
+                    if (error) throw error;
+            
+                    // 重新加载统计和列表
+                    loadFeedbackStats();
+                    loadFeedback();
+                    
+                    alert('反馈已标记为待处理');
+            
+                } catch (error) {
+                    console.error('标记反馈失败:', error);
+                    alert('操作失败，请重试');
+                }
+            }
+            
+            // 删除反馈
+            async function deleteFeedback(feedbackId) {
+                if (!confirm('确定删除这条反馈吗？此操作不可恢复。')) return;
+            
+                try {
+                    const { error } = await window.supabase
+                        .from('feedback')
+                        .delete()
+                        .eq('id', feedbackId);
+            
+                    if (error) throw error;
+            
+                    // 重新加载统计和列表
+                    loadFeedbackStats();
+                    loadFeedback();
+                    
+                    alert('反馈已删除');
+            
+                } catch (error) {
+                    console.error('删除反馈失败:', error);
+                    alert('删除失败，请重试');
+                }
+            }
+            
+            // 过滤功能
+            function showOnlyPending() {
+                currentFeedbackFilter = 'pending';
+                loadFeedback();
+            }
+            
+            function showAllFeedback() {
+                currentFeedbackFilter = 'all';
+                loadFeedback();
+            }
+        
         
         // 显示状态消息
         function showStatus(elementId, message, type) {
