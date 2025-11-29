@@ -25,7 +25,7 @@ try {
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RB/Tisir_R的个人网页Ver.4.6(改进中)</title>
+    <title>RB/Tisir_R的个人网页Ver.4.7(改进中)</title>
     
         <!-- 网站头像 -->
     <link rel="apple-touch-icon" sizes="57x57" href="https://raw.githubusercontent.com/TisirR/PersonalFile-ProjectWeb-1/favicons/apple-icon-57x57.png">
@@ -804,6 +804,18 @@ try {
                     .replace(/'/g, "&#039;");
             }
 
+            // 将文本中的网址转换为可点击链接
+            function autoLink(text) {
+                if (!text) return '';
+                
+                // 匹配 http/https/ftp 开头的网址
+                const urlRegex = /(https?:\/\/[^\s]+)/g;
+                
+                return text.replace(urlRegex, function(url) {
+                    return '<a href="' + url + '" target="_blank" style="color: #667eea; text-decoration: underline;">' + url + '</a >';
+                });
+            }
+
         // 用数据更新页面
         function updatePageWithData(data) {
             // 更新页面显示
@@ -833,9 +845,12 @@ try {
                 projectElement.style.borderRadius = '8px';
                 projectElement.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
                 
+                // 处理描述中的链接
+                const descriptionHtml = autoLink(project.description);
+                
                 projectElement.innerHTML = `
                     <h3 style="margin-top: 0; color: #667eea;">${project.title}</h3>
-                    <p style="margin-bottom: 0; white-space: pre-line;">${project.description}</p >
+                    <p style="margin-bottom: 0; white-space: pre-line;">${descriptionHtml}</p >
                 `;
                 projectsContainer.appendChild(projectElement);
             });
@@ -867,7 +882,7 @@ try {
             window.currentData = data;
             
             // 设置初始标题
-            document.title = data.activeTitle || "RB/Tisir_R的个人网页Ver.4.6";
+            document.title = data.activeTitle || "RB/Tisir_R的个人网页";
         }
 
         // 更新头像显示 - 修复版本
