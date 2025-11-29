@@ -25,7 +25,7 @@ try {
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RB/Tisir_R的个人网页Ver.4.8(改进中)</title>
+    <title>RB/Tisir_R的个人网页Ver.4.8.2(改进中)</title>
     
         <!-- 网站头像 -->
     <link rel="apple-touch-icon" sizes="57x57" href="https://raw.githubusercontent.com/TisirR/PersonalFile-ProjectWeb-1/favicons/apple-icon-57x57.png">
@@ -479,7 +479,7 @@ try {
                 <textarea id="feedbackMessage" placeholder="请详细描述您的建议或遇到的问题..." style="width: 100%; height: 120px;"></textarea>
             </div>
             
-            <button class="btn" onclick="submitFeedback()">提交反馈</button>
+            <button class="btn" id="feedbackSubmitBtn" onclick="submitFeedback()">提交反馈</button>
             
             <div id="feedbackStatus" class="status-message" style="display: none;"></div>
         </section>
@@ -644,7 +644,7 @@ try {
         // 初始化页面
         document.addEventListener('DOMContentLoaded', function() {
             loadData();
-            updateGlobalVisitorCounter();
+            updateVisitorStats();
             document.getElementById('last_updated').textContent = new Date().toLocaleDateString('zh-CN');
 
             // 监听密码输入框的Enter键
@@ -695,52 +695,155 @@ try {
             }
         }
 
-                // 全局访客计数器
-            async function updateGlobalVisitorCounter() {
+            // 优化的访客统计系统
+            async function updateVisitorStats() {
                 try {
                     // 检查 Supabase 是否可用
                     if (!window.supabase) {
                         throw new Error('Supabase 不可用');
                     }
             
-                    // 从数据库获取当前计数
+                    // 生成或获取访客ID
+                    let visitorId = localStorage.getItem('visitor_id');
+                    let isNewVisitor = false;
+            
+                    if (!visitorId) {
+                        // 新访客 - 生成唯一ID
+                        visitorId = generateVisitorId();
+                        localStorage.setItem('visitor_id', visitorId);
+                        isNewVisitor = true;
+                        console.log('新访客:', visitorId);
+                    } else {
+                        console.log('回访访客:', visitorId);
+                    }
+            
+                    // 更新访客会话
+                    await updateVisitorSession(visitorId);
+            
+                    // 更新总访问次数和独立访客数
+                    await updateVisitorCounts(isNewVisitor);
+            
+                    // 更新页面显示
+                    await loadVisitorStats();
+            
+                } catch (error) {
+                    console.error('更新访客统计失败:', error);
+                    // 降级到本地计数
+                    fallbackToLocalStats();
+                }
+            }
+            
+            // 生成唯一访客ID
+            function generateVisitorId() {
+                return 'visitor_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+            
+            // 更新访客会话
+            async function updateVisitorSession(visitorId) {
+                const { data, error } = await window.supabase
+                    .from('visitor_sessions')
+                    .select('*')
+                    .eq('visitor_id', visitorId)
+                    .single();
+            
+                if (error && error.code === 'PGRST116') {
+                    // 新访客 - 创建会话
+                    const { error: insertError } = await window.supabase
+                        .from('visitor_sessions')
+                        .insert([
+                            {
+                                visitor_id: visitorId,
+                                first_visit: new Date().toISOString(),
+                                last_visit: new Date().toISOString(),
+                                visit_count: 1
+                            }
+                        ]);
+                    
+                    if (insertError) throw insertError;
+                } else if (data) {
+                    // 回访访客 - 更新会话
+                    const { error: updateError } = await window.supabase
+                        .from('visitor_sessions')
+                        .update({
+                            last_visit: new Date().toISOString(),
+                            visit_count: data.visit_count + 1
+                        })
+                        .eq('visitor_id', visitorId);
+                    
+                    if (updateError) throw updateError;
+                } else if (error) {
+                    throw error;
+                }
+            }
+            
+            // 更新总访问次数和独立访客数
+            async function updateVisitorCounts(isNewVisitor) {
+                // 获取当前统计
+                const { data: currentStats, error: fetchError } = await window.supabase
+                    .from('visitor_stats')
+                    .select('*')
+                    .eq('id', 1)
+                    .single();
+            
+                if (fetchError) throw fetchError;
+            
+                // 更新统计
+                const updateData = {
+                    total_visits: currentStats.total_visits + 1,
+                    unique_visitors: currentStats.unique_visitors + (isNewVisitor ? 1 : 0),
+                    updated_at: new Date().toISOString()
+                };
+            
+                const { error: updateError } = await window.supabase
+                    .from('visitor_stats')
+                    .update(updateData)
+                    .eq('id', 1);
+            
+                if (updateError) throw updateError;
+            }
+            
+            // 加载并显示访客统计
+            async function loadVisitorStats() {
+                try {
                     const { data, error } = await window.supabase
-                        .from('visitor_counter')
-                        .select('count')
+                        .from('visitor_stats')
+                        .select('total_visits, unique_visitors')
                         .eq('id', 1)
                         .single();
             
                     if (error) throw error;
             
-                    let currentCount = data.count;
-                    currentCount++; // 增加计数
-            
-                    // 更新数据库中的计数
-                    const { error: updateError } = await window.supabase
-                        .from('visitor_counter')
-                        .update({ count: currentCount })
-                        .eq('id', 1);
-            
-                    if (updateError) throw updateError;
-            
-                    // 更新页面显示
-                    document.getElementById('visitorCount').textContent = currentCount;
-                    console.log('全局访客计数已更新:', currentCount);
-            
+                    if (data) {
+                        document.getElementById('totalVisits').textContent = data.total_visits;
+                        document.getElementById('uniqueVisitors').textContent = data.unique_visitors;
+                    }
                 } catch (error) {
-                    console.error('更新全局访客计数失败:', error);
-                    // 降级到本地计数
-                    fallbackToLocalCounter();
+                    console.error('加载访客统计失败:', error);
                 }
             }
             
-            // 备用本地计数器
-            function fallbackToLocalCounter() {
-                let count = parseInt(localStorage.getItem('visitorCount') || '0');
-                count++;
-                localStorage.setItem('visitorCount', count.toString());
-                document.getElementById('visitorCount').textContent = count;
-                console.log('使用本地访客计数:', count);
+            // 备用本地统计
+            function fallbackToLocalStats() {
+                let totalVisits = parseInt(localStorage.getItem('localTotalVisits') || '0');
+                let uniqueVisitors = parseInt(localStorage.getItem('localUniqueVisitors') || '0');
+                
+                totalVisits++;
+                
+                // 检查是否是新访客
+                let visitorId = localStorage.getItem('visitor_id');
+                if (!visitorId) {
+                    visitorId = generateVisitorId();
+                    localStorage.setItem('visitor_id', visitorId);
+                    uniqueVisitors++;
+                }
+                
+                localStorage.setItem('localTotalVisits', totalVisits.toString());
+                localStorage.setItem('localUniqueVisitors', uniqueVisitors.toString());
+                
+                document.getElementById('totalVisits').textContent = totalVisits;
+                document.getElementById('uniqueVisitors').textContent = uniqueVisitors;
+                
+                console.log('使用本地访客统计:', { totalVisits, uniqueVisitors });
             }
         
             // 添加新的项目输入框
@@ -1210,44 +1313,76 @@ try {
             }
         }
 
-                // 提交反馈到数据库
-        async function submitFeedback() {
-            const name = document.getElementById('feedbackName').value.trim();
-            const email = document.getElementById('feedbackEmail').value.trim();
-            const message = document.getElementById('feedbackMessage').value.trim();
-            
-            // 验证必填字段
-            if (!message) {
-                showStatus('feedbackStatus', '请填写反馈内容!', 'error');
-                return;
-            }
-            
-            try {
-                // 保存到 Supabase
-                const { error } = await window.supabase
-                    .from('feedback')
-                    .insert([
-                        {
-                            name: name || '匿名用户',
-                            email: email || '',
-                            message: message
-                        }
-                    ]);
+            // 提交反馈到数据库 - 增强版（带自动关闭和按钮状态）
+            async function submitFeedback() {
+                const submitBtn = document.getElementById('feedbackSubmitBtn');
+                const originalText = submitBtn.textContent;
+                
+                // 显示加载状态
+                submitBtn.textContent = '提交中...';
+                submitBtn.disabled = true;
+                
+                const name = document.getElementById('feedbackName').value.trim();
+                const email = document.getElementById('feedbackEmail').value.trim();
+                const message = document.getElementById('feedbackMessage').value.trim();
+                
+                // 验证必填字段
+                if (!message) {
+                    showStatus('feedbackStatus', '请填写反馈内容!', 'error');
+                    // 恢复按钮状态
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                    // 3秒后自动关闭错误提示
+                    setTimeout(() => {
+                        hideStatus('feedbackStatus');
+                    }, 3000);
+                    return;
+                }
+                
+                try {
+                    // 保存到 Supabase
+                    const { error } = await window.supabase
+                        .from('feedback')
+                        .insert([
+                            {
+                                name: name || '匿名用户',
+                                email: email || '',
+                                message: message
+                            }
+                        ]);
+                        
+                    if (error) throw error;
                     
-                if (error) throw error;
-                
-                // 清空表单
-                document.getElementById('feedbackName').value = '';
-                document.getElementById('feedbackEmail').value = '';
-                document.getElementById('feedbackMessage').value = '';
-                
-                showStatus('feedbackStatus', '让我看看！😋', 'success');
-                
-            } catch (error) {
-                console.error('提交反馈失败:', error);
-                showStatus('feedbackStatus', '提交失败，请稍后重试!', 'error');
+                    // 清空表单
+                    document.getElementById('feedbackName').value = '';
+                    document.getElementById('feedbackEmail').value = '';
+                    document.getElementById('feedbackMessage').value = '';
+                    
+                    showStatus('feedbackStatus', '我晚点就去Supabase上康康😋', 'success');
+                    
+                    // 恢复按钮状态
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                    
+                    // 3秒后自动关闭成功提示
+                    setTimeout(() => {
+                        hideStatus('feedbackStatus');
+                    }, 3000);
+                    
+                } catch (error) {
+                    console.error('提交反馈失败:', error);
+                    showStatus('feedbackStatus', '提交失败，请稍后重试!', 'error');
+                    
+                    // 恢复按钮状态
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                    
+                    // 3秒后自动关闭错误提示
+                    setTimeout(() => {
+                        hideStatus('feedbackStatus');
+                    }, 3000);
+                }
             }
-        }
         
         // 显示状态消息
         function showStatus(elementId, message, type) {
@@ -1277,9 +1412,17 @@ try {
     </script>
 
         <!-- 访客计数器 -->
-    <div class="visitor-counter">
-        <span>👤 访客计数: </span>
-        <span id="visitorCount">0</span>
-    </div>
+        <div class="visitor-counter">
+            <div style="text-align: center;">
+                <div style="margin-bottom: 5px;">
+                    <span style="font-size: 0.8em;">📊 总访问次数:</span>
+                    <span id="totalVisits" style="font-weight: bold;">0</span>
+                </div>
+                <div>
+                    <span style="font-size: 0.8em;">👥 独立访客:</span>
+                    <span id="uniqueVisitors" style="font-weight: bold;">0</span>
+                </div>
+            </div>
+        </div>
 
 </body></html>
