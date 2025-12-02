@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<!-- saved from url=(0051)file:///C:/Users/q8972/Desktop/SelfwebTexting2.html -->
-<html lang="zh-CN"><head>
+<html lang="zh-CN">
+<head>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // 使用您的配置信息
@@ -25,7 +25,7 @@ try {
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RB/Tisir_R的个人网页Ver.4.8.3(改进中)</title>
+    <title>RB/Tisir_R的个人网页Ver.5.0(悬浮窗版)</title>
     
         <!-- 网站头像 -->
     <link rel="apple-touch-icon" sizes="57x57" href="https://raw.githubusercontent.com/TisirR/PersonalFile-ProjectWeb-1/favicons/apple-icon-57x57.png">
@@ -47,6 +47,100 @@ try {
     <meta name="theme-color" content="#ffffff">
         
     <style>
+        /* 悬浮窗基础样式（贴合原风格） */
+        .window {
+            position: absolute;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            z-index: 50;
+            transition: all 0.3s ease;
+            cursor: move;
+        }
+        /* 悬浮窗控制栏（原主色渐变） */
+        .window-header {
+            padding: 8px 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+        }
+        /* 控制栏按钮 */
+        .window-controls button {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            margin-left: 15px;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 3px;
+            transition: background 0.3s;
+        }
+        .window-controls button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        /* 悬浮窗内容区 */
+        .window-content {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: calc(100% - 45px);
+        }
+
+        /* 底部最小化导航条 */
+        #minBar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: none; /* 默认隐藏 */
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            z-index: 100;
+        }
+        .min-item {
+            background: transparent;
+            border: none;
+            color: #667eea;
+            font-size: 16px;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .min-item:hover, .min-item.active {
+            background: #667eea;
+            color: white;
+        }
+
+        /* 悬浮窗响应式适配 */
+        @media (max-width: 1200px) {
+            #window1 { top: 20px; left: 20px; width: 40%; }
+            #window2 { top: 20px; right: 20px; width: 50%; }
+            #window3 { top: calc(50% + 20px); left: 20px; width: calc(100% - 40px); }
+        }
+        @media (max-width: 600px) {
+            .window {
+                width: calc(100% - 20px) !important;
+                left: 10px !important;
+                right: 10px !important;
+            }
+            #window1 { top: 10px; height: auto; }
+            #window2 { top: calc(35% + 10px); height: auto; }
+            #window3 { top: calc(70% + 10px); height: auto; }
+            .window-header { padding: 6px 10px; }
+            .window-content { padding: 15px; }
+            #minBar { gap: 15px; height: 45px; }
+            .min-item { font-size: 14px; padding: 6px 10px; }
+        }
 
         .visitor-counter {
             text-align: center;
@@ -61,6 +155,7 @@ try {
             bottom: 20px;
             right: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 10; /* 避免被悬浮窗遮挡 */
         }
         
         body {
@@ -70,18 +165,7 @@ try {
             background-color: #f0f2f5;
             color: #333;
             line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 900px;
-            margin: 20px auto;
-            padding: 20px;
-            background: white;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            /* 添加移动端适配 */
-            width: 100%;
-            box-sizing: border-box;
+            min-height: 100vh;
         }
         
         /* 防止文字溢出 */
@@ -91,79 +175,30 @@ try {
             max-width: 100%;
         }
         
-        header {
-            text-align: center;
-            padding: 40px 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            position: relative;
-        }
-        
-        .avatar-container {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-        
-        .avatar {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            border: 5px solid white;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-        
-        .avatar:hover {
-            transform: scale(1.05);
-        }
-        
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .avatar-edit-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .avatar-container:hover .avatar-edit-overlay {
-            opacity: 1;
-        }
-        
-        h1 {
-            margin: 0 0 10px;
-            font-size: 2.5em;
-        }
-        
-        .tagline {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-        
-        .section {
-            margin: 30px 0;
-            padding: 25px;
+        /* 悬浮窗内的section样式调整 */
+        .window .section {
+            margin: 20px 0;
+            padding: 20px;
             border-left: 4px solid #667eea;
             background: #f9f9f9;
             border-radius: 0 8px 8px 0;
+        }
+        
+        .window .section:first-child {
+            margin-top: 0;
+        }
+        
+        h1 {
+            margin: 10px 0;
+            font-size: 2em;
+            text-align: center;
+        }
+        
+        .tagline {
+            font-size: 1.1em;
+            opacity: 0.9;
+            text-align: center;
+            margin-bottom: 20px;
         }
         
         h2 {
@@ -190,14 +225,6 @@ try {
         
         .skill:hover {
             transform: translateY(-3px);
-        }
-        
-        footer {
-            text-align: center;
-            padding: 20px;
-            margin-top: 30px;
-            border-top: 1px solid #eee;
-            color: #666;
         }
         
         /* 模态框样式 */
@@ -300,6 +327,57 @@ try {
             background: #5a6268;
         }
         
+        .avatar-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 10px;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .avatar {
+            width: 120px; /* 调整为适应窗口缩小 */
+            height: 120px; /* 调整为适应窗口缩小 */
+            border-radius: 50%;
+            border: 5px solid white;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin: 0 auto; /* 新增：让头像居中 */
+        }
+        
+        .avatar:hover {
+            transform: scale(1.05);
+        }
+        
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .avatar-edit-overlay {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px; /* 调整为适应窗口缩小 */
+            height: 120px; /* 调整为适应窗口缩小 */
+            background: rgba(0,0,0,0.7);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .avatar-container:hover .avatar-edit-overlay {
+            opacity: 1;
+        }
+        
         .avatar-preview {
             width: 100px;
             height: 100px;
@@ -372,23 +450,8 @@ try {
         }
         
         @media (max-width: 600px) {
-            .container {
-                margin: 10px;
+            .window .section {
                 padding: 15px;
-                width: calc(100% - 20px); /* 新增：确保不超出屏幕 */
-            }
-            
-            header {
-                padding: 20px 0;
-            }
-            
-            h1 {
-                font-size: 2em;
-            }
-            
-            .avatar {
-                width: 120px;
-                height: 120px;
             }
             
             /* 新增：防止文字溢出 */
@@ -413,112 +476,151 @@ try {
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="avatar-container">
-                <div class="avatar" id="avatarDisplay"><img src="" alt="个人头像"></div>
-                <div class="avatar-edit-overlay" onclick="openPasswordModal('avatar')">
-                    <span>修改头像</span>
-                </div>
-            </div>
-            <h1 id="displayName">RB/Tisir_R</h1>
-            <p class="tagline" id="displayTagline">个签</p>
-        </header>
-        
+    <!-- 左上窗：个人信息（头像、姓名、个签、关于我、教育背景） -->
+    <div class="window" id="window1" style="top: 30px; left: 30px; width: 380px; height: 420px;">
+      <div class="window-header">
+        <span>个人信息</span>
+        <div class="window-controls">
+          <button class="min-btn">-</button>
+          <button class="max-btn">□</button>
+          <button class="close-btn">×</button>
+        </div>
+      </div>
+      <div class="window-content">
+        <!-- 原有头像+姓名+个签模块 -->
+        <div class="avatar-container">
+          <div class="avatar" id="avatarDisplay"><img src="" alt="个人头像"></div>
+          <div class="avatar-edit-overlay" onclick="openPasswordModal('avatar')">
+            <span>修改头像</span>
+          </div>
+        </div>
+        <h1 id="displayName">RB/Tisir_R</h1>
+        <p class="tagline" id="displayTagline">个签</p>
+
+        <!-- 原有"关于我"section -->
         <section class="section">
-            <h2>关于我</h2>
-            <p id="displayAbout">简介.txt</p>
-        </section>
-        
-        <section class="section">
-            <h2>教育背景</h2>
-            <p id="displayEducation"><strong>这是大学</strong> - 我的专业 (2025-2029)</p>
-        </section>
-        
-        <section class="section">
-            <h2>我的技能</h2>
-            <div class="skills" id="displaySkills"><div class="skill">暂无</div></div>
-        </section>
-        
-        <section class="section">
-            <h2>其他信息</h2>
-            <div id="displayProjects">
-                <div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 5px;">
-                    <h3 style="margin-top: 0; color: #667eea;">主要活跃平台</h3>
-                    <p style="margin-bottom: 0;">平台</p>
-                </div></div>
-        </section>
-        
-        <section class="section">
-            <h2>联系方式</h2>
-            <div id="displayContact"><p>📧 邮箱：example@email.com</div>
-        </section>
-        
-        <section class="section">
-            <h2>网站设置</h2>
-            <p>你可以随时修改网站内容，所有更改会自动保存。</p >
-            <button class="btn" onclick="openPasswordModal('edit')">编辑全部内容</button>
+          <h2>关于我</h2>
+          <p id="displayAbout">简介.txt</p>
         </section>
 
-        <!-- 反馈管理模块 -->
+        <!-- 原有"教育背景"section -->
         <section class="section">
-            <h2>反馈管理</h2>
-            
-            <!-- 反馈统计 -->
-            <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
-                <div class="feedback-stat" style="background: #e3f2fd; padding: 15px; border-radius: 8px; min-width: 120px;">
-                    <div style="font-size: 0.9em; color: #1976d2;">待处理反馈</div>
-                    <div id="pendingCount" style="font-size: 1.5em; font-weight: bold; color: #1976d2;">0</div>
-                </div>
-                <div class="feedback-stat" style="background: #e8f5e8; padding: 15px; border-radius: 8px; min-width: 120px;">
-                    <div style="font-size: 0.9em; color: #2e7d32;">已处理反馈</div>
-                    <div id="processedCount" style="font-size: 1.5em; font-weight: bold; color: #2e7d32;">0</div>
-                </div>
-                <div class="feedback-stat" style="background: #f3e5f5; padding: 15px; border-radius: 8px; min-width: 120px;">
-                    <div style="font-size: 0.9em; color: #7b1fa2;">总反馈数</div>
-                    <div id="totalCount" style="font-size: 1.5em; font-weight: bold; color: #7b1fa2;">0</div>
-                </div>
-            </div>
-            
-            <!-- 反馈列表 -->
-            <div id="feedbackList" style="max-height: 400px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; background: #fafafa;">
-                <p style="text-align: center; color: #666;">加载反馈中...</p >
-            </div>
-            
-            <div style="margin-top: 15px; display: flex; gap: 10px;">
-                <button class="btn" onclick="loadFeedback()">刷新反馈列表</button>
-                <button class="btn btn-secondary" onclick="showOnlyPending()">只看待处理</button>
-                <button class="btn btn-secondary" onclick="showAllFeedback()">显示全部</button>
-            </div>
+          <h2>教育背景</h2>
+          <p id="displayEducation"><strong>这是大学</strong> - 我的专业 (2025-2029)</p>
+        </section>
+      </div>
+    </div>
+
+    <!-- 左下窗：技能、网站设置 -->
+    <div class="window" id="window2" style="top: 470px; left: 30px; width: 380px; height: 320px;">
+      <div class="window-header">
+        <span>技能与设置</span>
+        <div class="window-controls">
+          <button class="min-btn">-</button>
+          <button class="max-btn">□</button>
+          <button class="close-btn">×</button>
+        </div>
+      </div>
+      <div class="window-content">
+        <!-- 原有"我的技能"section -->
+        <section class="section">
+          <h2>我的技能</h2>
+          <div class="skills" id="displaySkills"><div class="skill">暂无</div></div>
         </section>
 
+        <!-- 原有"网站设置"section -->
         <section class="section">
-            <h2>反馈与建议</h2>
-            <p>欢迎提出宝贵意见，帮助我改进网站！</p >
-            
-            <div class="form-group">
-                <label>您的称呼 (可选):</label>
-                <input type="text" id="feedbackName" placeholder="怎么称呼您？" style="width: 100%;">
-            </div>
-            
-            <div class="form-group">
-                <label>邮箱 (可选，用于回复):</label>
-                <input type="email" id="feedbackEmail" placeholder="您的邮箱地址" style="width: 100%;">
-            </div>
-            
-            <div class="form-group">
-                <label>反馈内容:</label>
-                <textarea id="feedbackMessage" placeholder="请详细描述您的建议或遇到的问题..." style="width: 100%; height: 120px;"></textarea>
-            </div>
-            
-            <button class="btn" id="feedbackSubmitBtn" onclick="submitFeedback()">提交反馈</button>
-            
-            <div id="feedbackStatus" class="status-message" style="display: none;"></div>
+          <h2>网站设置</h2>
+          <p>你可以随时修改网站内容，所有更改会自动保存。</p >
+          <button class="btn" onclick="openPasswordModal('edit')">编辑全部内容</button>
         </section>
-        
-        <footer>
-            <p>© 2025 我的个人网页 | 最后更新: <span id="last_updated">2025/11/28</span></p>
-        </footer>
+      </div>
+    </div>
+
+    <!-- 右侧窗：其他信息、联系方式、反馈管理、反馈建议 -->
+    <div class="window" id="window3" style="top: 30px; right: 30px; width: 520px; height: 760px;">
+      <div class="window-header">
+        <span>内容与反馈</span>
+        <div class="window-controls">
+          <button class="min-btn">-</button>
+          <button class="max-btn">□</button>
+          <button class="close-btn">×</button>
+        </div>
+      </div>
+      <div class="window-content">
+        <!-- 原有"其他信息"section -->
+        <section class="section">
+          <h2>其他信息</h2>
+          <div id="displayProjects">
+            <div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 5px;">
+              <h3 style="margin-top: 0; color: #667eea;">主要活跃平台</h3>
+              <p style="margin-bottom: 0;">平台</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 原有"联系方式"section -->
+        <section class="section">
+          <h2>联系方式</h2>
+          <div id="displayContact"><p>📧 邮箱：example@email.com</div>
+        </section>
+
+        <!-- 原有"反馈管理"section -->
+        <section class="section">
+          <h2>反馈管理</h2>
+          <!-- 原有反馈管理内容（完整保留） -->
+          <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+            <div class="feedback-stat" style="background: #e3f2fd; padding: 15px; border-radius: 8px; min-width: 120px;">
+              <div style="font-size: 0.9em; color: #1976d2;">待处理反馈</div>
+              <div id="pendingCount" style="font-size: 1.5em; font-weight: bold; color: #1976d2;">0</div>
+            </div>
+            <div class="feedback-stat" style="background: #e8f5e8; padding: 15px; border-radius: 8px; min-width: 120px;">
+              <div style="font-size: 0.9em; color: #2e7d32;">已处理反馈</div>
+              <div id="processedCount" style="font-size: 1.5em; font-weight: bold; color: #2e7d32;">0</div>
+            </div>
+            <div class="feedback-stat" style="background: #f3e5f5; padding: 15px; border-radius: 8px; min-width: 120px;">
+              <div style="font-size: 0.9em; color: #7b1fa2;">总反馈数</div>
+              <div id="totalCount" style="font-size: 1.5em; font-weight: bold; color: #7b1fa2;">0</div>
+            </div>
+          </div>
+          <div id="feedbackList" style="max-height: 200px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; background: #fafafa;">
+            <p style="text-align: center; color: #667eea;">加载反馈中...</p >
+          </div>
+          <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn" onclick="loadFeedback()">刷新反馈列表</button>
+            <button class="btn btn-secondary" onclick="showOnlyPending()">只看待处理</button>
+            <button class="btn btn-secondary" onclick="showAllFeedback()">显示全部</button>
+          </div>
+        </section>
+
+        <!-- 原有"反馈与建议"section -->
+        <section class="section">
+          <h2>反馈与建议</h2>
+          <!-- 原有反馈建议内容（完整保留） -->
+          <p>欢迎提出宝贵意见，帮助我改进网站！</p >
+          <div class="form-group">
+            <label>您的称呼 (可选):</label>
+            <input type="text" id="feedbackName" placeholder="怎么称呼您？" style="width: 100%;">
+          </div>
+          <div class="form-group">
+            <label>邮箱 (可选，用于回复):</label>
+            <input type="email" id="feedbackEmail" placeholder="您的邮箱地址" style="width: 100%;">
+          </div>
+          <div class="form-group">
+            <label>反馈内容:</label>
+            <textarea id="feedbackMessage" placeholder="请详细描述您的建议或遇到的问题..." style="width: 100%; height: 100px;"></textarea>
+          </div>
+          <button class="btn" id="feedbackSubmitBtn" onclick="submitFeedback()">提交反馈</button>
+          <div id="feedbackStatus" class="status-message" style="display: none;"></div>
+        </section>
+      </div>
+    </div>
+
+    <!-- 底部最小化导航条 -->
+    <div id="minBar">
+      <button class="min-item" data-target="window1">个人信息</button>
+      <button class="min-item" data-target="window2">技能与设置</button>
+      <button class="min-item" data-target="window3">内容与反馈</button>
     </div>
 
     <!-- 头像编辑模态框 -->
@@ -627,7 +729,6 @@ try {
     </div>
 
     <script>
-
         // 密码设置
         const EDIT_PASSWORD = "q8972111"; // 你可以修改这个密码
 
@@ -678,6 +779,10 @@ try {
             loadData();
             updateVisitorStats();
             loadFeedbackStats();
+            
+            // 新增：初始化悬浮窗位置（防止刷新后错位）
+            initWindowPositions();
+            
             document.getElementById('last_updated').textContent = new Date().toLocaleDateString('zh-CN');
 
             // 监听密码输入框的Enter键
@@ -1190,7 +1295,6 @@ try {
                     
                     // 更新页面显示，但不在本地存储保存 Base64 数据
                     updateAvatarDisplay(avatarData);
-                    document.getElementById('last_updated').textContent = new Date().toLocaleDateString('zh-CN');
                     
                     // 更新本地存储，但不包含大尺寸头像数据
                     const dataForLocalStorage = { ...updateData };
@@ -1327,7 +1431,6 @@ try {
                 
                 // 更新页面显示
                 updatePageWithData(newData);
-                document.getElementById('last_updated').textContent = new Date().toLocaleDateString('zh-CN');
                 
                 showStatus('editStatus', '数据已保存到云端！', 'success');
                 
@@ -1341,7 +1444,6 @@ try {
                 // 降级到本地存储
                 localStorage.setItem('personalWebsiteData', JSON.stringify(newData));
                 updatePageWithData(newData);
-                document.getElementById('last_updated').textContent = new Date().toLocaleDateString('zh-CN');
                 showStatus('editStatus', '保存到云端失败，已保存到本地', 'error');
             }
         }
@@ -1661,6 +1763,138 @@ try {
                 closePasswordModal();
             }
         });
+
+        // 悬浮窗交互核心逻辑
+        let activeWindow = null;
+        let offsetX, offsetY;
+
+        // 1. 悬浮窗拖拽功能
+        document.querySelectorAll('.window-header').forEach(header => {
+            header.addEventListener('mousedown', (e) => {
+                const window = header.closest('.window');
+                activeWindow = window;
+                // 置顶当前窗口
+                const allWindows = document.querySelectorAll('.window');
+                allWindows.forEach(win => win.style.zIndex = 50);
+                window.style.zIndex = 100;
+                
+                // 计算鼠标偏移量
+                const rect = window.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                
+                e.stopPropagation(); // 避免触发模态框关闭
+            });
+        });
+
+        // 全局鼠标移动监听（实现拖拽）
+        document.addEventListener('mousemove', (e) => {
+            if (!activeWindow) return;
+            const x = e.clientX - offsetX;
+            const y = e.clientY - offsetY;
+            
+            // 限制窗口不超出视口
+            const maxX = window.innerWidth - activeWindow.offsetWidth;
+            const maxY = window.innerHeight - activeWindow.offsetHeight - 60; // 预留底部导航高度
+            const clampedX = Math.max(0, Math.min(x, maxX));
+            const clampedY = Math.max(0, Math.min(y, maxY));
+            
+            activeWindow.style.left = `${clampedX}px`;
+            activeWindow.style.top = `${clampedY}px`;
+        });
+
+        // 释放鼠标取消拖拽
+        document.addEventListener('mouseup', () => {
+            activeWindow = null;
+        });
+
+        // 2. 最小化按钮功能
+        document.querySelectorAll('.min-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const window = btn.closest('.window');
+                window.style.display = 'none';
+                document.getElementById('minBar').style.display = 'flex';
+                e.stopPropagation();
+            });
+        });
+
+        // 3. 最大化/还原按钮功能
+        document.querySelectorAll('.max-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const window = btn.closest('.window');
+                const isMaxed = window.classList.contains('maximized');
+                
+                if (isMaxed) {
+                    // 还原默认尺寸和位置
+                    window.classList.remove('maximized');
+                    if (window.id === 'window1') {
+                        window.style.width = '380px';
+                        window.style.height = '420px';
+                        window.style.left = '30px';
+                        window.style.top = '30px';
+                        window.style.right = 'auto';
+                    } else if (window.id === 'window2') {
+                        window.style.width = '380px';
+                        window.style.height = '320px';
+                        window.style.left = '30px';
+                        window.style.top = '470px';
+                        window.style.right = 'auto';
+                    } else if (window.id === 'window3') {
+                        window.style.width = '520px';
+                        window.style.height = '760px';
+                        window.style.right = '30px';
+                        window.style.left = 'auto';
+                        window.style.top = '30px';
+                    }
+                } else {
+                    // 最大化（占满视口，预留边距）
+                    window.classList.add('maximized');
+                    window.style.width = `${window.innerWidth - 40}px`;
+                    window.style.height = `${window.innerHeight - 80}px`;
+                    window.style.left = '20px';
+                    window.style.top = '20px';
+                    window.style.right = '20px';
+                }
+                e.stopPropagation();
+            });
+        });
+
+        // 4. 关闭按钮功能
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const window = btn.closest('.window');
+                window.style.display = 'none';
+                document.getElementById('minBar').style.display = 'flex';
+                e.stopPropagation();
+            });
+        });
+
+        // 5. 底部导航恢复窗口
+        document.querySelectorAll('.min-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const targetId = item.dataset.target;
+                const targetWindow = document.getElementById(targetId);
+                targetWindow.style.display = 'block';
+                // 置顶恢复的窗口
+                const allWindows = document.querySelectorAll('.window');
+                allWindows.forEach(win => win.style.zIndex = 50);
+                targetWindow.style.zIndex = 100;
+            });
+        });
+
+        // 6. 初始化悬浮窗位置（防止刷新后错位）
+        function initWindowPositions() {
+            const window1 = document.getElementById('window1');
+            const window2 = document.getElementById('window2');
+            const window3 = document.getElementById('window3');
+            
+            if (!window1.style.left) window1.style.left = '30px';
+            if (!window1.style.top) window1.style.top = '30px';
+            if (!window2.style.left) window2.style.left = '30px';
+            if (!window2.style.top) window2.style.top = '470px';
+            if (!window3.style.right) window3.style.right = '30px';
+            if (!window3.style.top) window3.style.top = '30px';
+        }
     </script>
 
         <!-- 访客计数器 -->
@@ -1677,4 +1911,5 @@ try {
             </div>
         </div>
 
-</body></html>
+</body>
+</html>
