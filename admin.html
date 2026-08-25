@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网站管理后台</title>
+    <link rel="stylesheet" href="./css/admin.css">
+</head>
+<body>
+    <div id="adminApp" class="admin-app">
+        <section id="loginView" class="login-card">
+            <h1>网站管理后台</h1>
+            <p>使用 Supabase Auth 的管理员账号登录。</p>
+            <label>邮箱<input id="loginEmail" type="email" autocomplete="username"></label>
+            <label>密码<input id="loginPassword" type="password" autocomplete="current-password"></label>
+            <button id="loginButton" type="button">登录</button>
+            <p id="loginStatus" class="status"></p>
+        </section>
+
+        <section id="dashboardView" class="dashboard" hidden>
+            <header class="admin-header">
+                <div><h1>网站管理后台</h1><p id="adminUser"></p></div>
+                <div class="header-actions">
+                    <a href="./index.html" target="_blank" rel="noopener">查看主页</a>
+                    <button id="logoutButton" type="button">退出登录</button>
+                </div>
+            </header>
+
+            <main class="admin-grid">
+                <section class="admin-panel">
+                    <h2>个人资料</h2>
+                    <label>显示名称<input id="profileName" type="text"></label>
+                    <label>副标题<input id="profileTagline" type="text"></label>
+                    <label>自我介绍<textarea id="profileIntroduction" rows="7"></textarea></label>
+                    <label>正常标题<input id="profileActiveTitle" type="text"></label>
+                    <label>切后台标题<input id="profileInactiveTitle" type="text"></label>
+                    <label>头像 URL<input id="profileAvatarUrl" type="url"></label>
+                    <label>或上传头像（最大 10 MB）<input id="profileAvatarFile" type="file" accept="image/*"></label>
+                    <button id="saveProfileButton" type="button">保存个人资料</button>
+                </section>
+
+                <section class="admin-panel">
+                    <h2>网站背景</h2>
+                    <label>背景类型
+                        <select id="appearanceType">
+                            <option value="default">默认渐变</option>
+                            <option value="solid">纯色</option>
+                            <option value="gradient">自定义渐变</option>
+                            <option value="image">背景图片</option>
+                        </select>
+                    </label>
+                    <label>纯色<input id="appearanceSolid" type="color"></label>
+                    <label>渐变起点<input id="appearanceStart" type="color"></label>
+                    <label>渐变终点<input id="appearanceEnd" type="color"></label>
+                    <label>渐变角度<input id="appearanceDirection" type="text" placeholder="135deg"></label>
+                    <label>背景图片 URL<input id="appearanceImageUrl" type="url"></label>
+                    <label>或上传背景图（最大 10 MB）<input id="appearanceImageFile" type="file" accept="image/*"></label>
+                    <label>背景模糊：<output id="appearanceBlurValue">0</output> px<input id="appearanceBlur" type="range" min="0" max="30" step="1"></label>
+                    <label>背景亮度：<output id="appearanceBrightnessValue">100</output> %<input id="appearanceBrightness" type="range" min="40" max="150" step="1"></label>
+                    <button id="saveAppearanceButton" type="button">保存背景</button>
+                </section>
+
+                <section class="admin-panel cards-panel">
+                    <div class="panel-title-row">
+                        <div><h2>信息卡</h2><p>可以新增、编辑、删除，并决定放在左耳、中间或右耳。</p></div>
+                        <button id="addCardButton" type="button">＋ 新增资料卡</button>
+                    </div>
+                    <div id="cardsEditor" class="cards-editor"></div>
+                    <button id="saveCardsButton" type="button">保存全部资料卡</button>
+                </section>
+            </main>
+            <p id="adminStatus" class="status fixed-status"></p>
+        </section>
+    </div>
+
+    <template id="cardTemplate">
+        <article class="editor-card">
+            <div class="card-editor-head">
+                <strong class="card-editor-number">资料卡</strong>
+                <button class="delete-card" type="button">删除</button>
+            </div>
+            <label>标题<input class="card-title-input" type="text"></label>
+            <label>内容<textarea class="card-content-input" rows="6"></textarea></label>
+            <div class="card-options">
+                <label>位置
+                    <select class="card-position-input">
+                        <option value="center">中间</option>
+                        <option value="left">左耳</option>
+                        <option value="right">右耳</option>
+                    </select>
+                </label>
+                <label>显示方式
+                    <select class="card-style-input">
+                        <option value="normal">普通独立卡片</option>
+                        <option value="connected">与同组卡片连接</option>
+                    </select>
+                </label>
+                <label>连接组 ID（普通卡可留空）<input class="card-group-input" type="text"></label>
+                <label>排序<input class="card-sort-input" type="number" min="0" step="1"></label>
+            </div>
+        </article>
+    </template>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./js/config.js"></script>
+    <script src="./js/supabase.js"></script>
+    <script src="./js/admin.js"></script>
+</body>
+</html>
