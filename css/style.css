@@ -1,10 +1,26 @@
 /* =========================================================
-   Base
+   Root
 ========================================================= */
 
 :root {
     --bg-1: #667eea;
     --bg-2: #764ba2;
+
+    /*
+        上方 Profile
+        与下方中间主体共用的宽度
+    */
+    --main-content-width: 760px;
+
+    /*
+        左右耳朵展开宽度
+    */
+    --ear-width: 260px;
+
+    /*
+        收起状态露出的耳朵宽度
+    */
+    --ear-handle-width: 34px;
 
     --panel: rgba(255, 255, 255, 0.92);
     --panel-strong: rgba(255, 255, 255, 0.97);
@@ -25,9 +41,13 @@
     --radius-small: 14px;
 
     --transition:
-        0.35s cubic-bezier(.2, .8, .2, 1);
+        0.38s cubic-bezier(.2, .8, .2, 1);
 }
 
+
+/* =========================================================
+   Reset
+========================================================= */
 
 * {
     box-sizing: border-box;
@@ -43,7 +63,6 @@ body {
     margin: 0;
 
     min-width: 320px;
-
     min-height: 100vh;
 
     color: var(--text);
@@ -55,6 +74,8 @@ body {
         "Segoe UI",
         "Microsoft YaHei",
         sans-serif;
+
+    overflow-x: hidden;
 
     background:
         linear-gradient(
@@ -86,6 +107,8 @@ body {
     background-size: cover;
     background-position: center;
 
+    transform: scale(1.03);
+
     transition:
         background var(--transition),
         filter var(--transition);
@@ -99,6 +122,8 @@ body {
 
     inset: 0;
 
+    pointer-events: none;
+
     background:
         radial-gradient(
             circle at 20% 20%,
@@ -111,22 +136,20 @@ body {
             rgba(255, 255, 255, 0.12),
             transparent 45%
         );
-
-    pointer-events: none;
 }
 
 
 /* =========================================================
-   Site
+   Site Shell
 ========================================================= */
 
 .site-shell {
-    width: min(960px, calc(100% - 32px));
+    width: 100%;
 
     margin: 0 auto;
 
     padding:
-        56px 0
+        56px 16px
         40px;
 
     display: flex;
@@ -141,10 +164,16 @@ body {
 
 /* =========================================================
    Profile Panel
+
+   宽度 = 中间主体
 ========================================================= */
 
 .profile-panel {
-    width: min(720px, 100%);
+    width:
+        min(
+            var(--main-content-width),
+            100%
+        );
 
     padding:
         38px
@@ -153,7 +182,8 @@ body {
 
     text-align: center;
 
-    background: var(--panel);
+    background:
+        var(--panel);
 
     border:
         1px solid
@@ -273,7 +303,7 @@ body {
 
 
 /* =========================================================
-   Text
+   Profile Text
 ========================================================= */
 
 .display-name {
@@ -385,31 +415,42 @@ body {
 
 /* =========================================================
    Information Shell
+
+   这是整个耳朵系统的核心。
+
+   外层不再是 Flex 三栏，
+   而是一个固定中间主体，
+   左右耳朵绝对定位到主体背后。
+
+   所以：
+   耳朵展开不会压缩中间主体。
 ========================================================= */
 
 .information-shell {
     position: relative;
 
-    width: min(760px, 100%);
+    width:
+        min(
+            var(--main-content-width),
+            100%
+        );
 
-    display: flex;
-
-    align-items: stretch;
-
-    justify-content: center;
+    isolation: isolate;
 }
 
 
-/* Main information */
+/* =========================================================
+   Main Information Panel
+========================================================= */
 
 .information-main {
     position: relative;
 
-    z-index: 2;
+    z-index: 3;
 
-    flex: 1;
+    width: 100%;
 
-    min-width: 0;
+    min-height: 240px;
 
     padding: 30px;
 
@@ -501,7 +542,9 @@ body {
 }
 
 
-/* Connected Cards */
+/* =========================================================
+   Connected Cards
+========================================================= */
 
 .card-group {
     overflow: visible;
@@ -543,61 +586,74 @@ body {
 
 
 /* =========================================================
-   Ears
+   Ears Base
+
+   默认状态：
+   耳朵藏在主体后面，
+   只露出 handle。
 ========================================================= */
 
 .ear {
-    position: relative;
+    position: absolute;
+
+    top: 12px;
+
+    bottom: 12px;
 
     z-index: 1;
 
-    width: 0;
+    width:
+        var(--ear-width);
+
+    min-height: 260px;
 
     overflow: visible;
 
     transition:
-        width var(--transition);
+        transform var(--transition);
 }
 
 
-/* Ear content */
+/* =========================================================
+   Ear Content
+========================================================= */
 
 .ear-content {
-    width: 260px;
+    width: 100%;
+    height: 100%;
 
-    min-height: 100%;
+    min-height: 260px;
 
-    padding: 28px 22px;
+    padding:
+        30px 22px;
 
-    opacity: 0;
-
-    pointer-events: none;
+    overflow-y: auto;
 
     background:
         rgba(255, 255, 255, 0.88);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.75);
+
+    box-shadow:
+        0 15px 45px
+        rgba(30, 20, 70, 0.12);
 
     backdrop-filter:
         blur(18px);
 
     -webkit-backdrop-filter:
         blur(18px);
-
-    box-shadow:
-        0 15px 45px
-        rgba(30, 20, 70, 0.12);
-
-    transition:
-        opacity 0.2s ease;
 }
 
 
-/* Left */
+/* =========================================================
+   Left Ear
+========================================================= */
 
-.ear-left .ear-content {
-    position: absolute;
-
-    top: 12px;
-    right: -1px;
+.ear-left {
+    right: 100%;
 
     border-radius:
         var(--radius-large)
@@ -605,33 +661,39 @@ body {
         0
         var(--radius-large);
 
-    border:
-        1px solid
-        rgba(255, 255, 255, 0.75);
+    transform:
+        translateX(
+            calc(
+                100% -
+                var(--ear-handle-width)
+            )
+        );
+}
 
+
+.ear-left .ear-content {
     border-right: none;
+
+    border-radius:
+        var(--radius-large)
+        0
+        0
+        var(--radius-large);
 }
 
 
 .ear-left.expanded {
-    width: 260px;
+    transform:
+        translateX(0);
 }
 
 
-.ear-left.expanded .ear-content {
-    opacity: 1;
+/* =========================================================
+   Right Ear
+========================================================= */
 
-    pointer-events: auto;
-}
-
-
-/* Right */
-
-.ear-right .ear-content {
-    position: absolute;
-
-    top: 12px;
-    left: -1px;
+.ear-right {
+    left: 100%;
 
     border-radius:
         0
@@ -639,28 +701,37 @@ body {
         var(--radius-large)
         0;
 
-    border:
-        1px solid
-        rgba(255, 255, 255, 0.75);
+    transform:
+        translateX(
+            calc(
+                -100% +
+                var(--ear-handle-width)
+            )
+        );
+}
 
+
+.ear-right .ear-content {
     border-left: none;
+
+    border-radius:
+        0
+        var(--radius-large)
+        var(--radius-large)
+        0;
 }
 
 
 .ear-right.expanded {
-    width: 260px;
-}
-
-
-.ear-right.expanded .ear-content {
-    opacity: 1;
-
-    pointer-events: auto;
+    transform:
+        translateX(0);
 }
 
 
 /* =========================================================
    Ear Handle
+
+   把手始终露在主体两侧。
 ========================================================= */
 
 .ear-handle {
@@ -668,10 +739,14 @@ body {
 
     top: 50%;
 
-    z-index: 5;
+    z-index: 10;
 
-    width: 34px;
-    height: 72px;
+    width:
+        var(--ear-handle-width);
+
+    height: 76px;
+
+    padding: 0;
 
     border: none;
 
@@ -694,8 +769,8 @@ body {
         translateY(-50%);
 
     transition:
-        transform var(--transition),
-        width var(--transition);
+        width var(--transition),
+        transform var(--transition);
 }
 
 
@@ -704,8 +779,10 @@ body {
 }
 
 
+/* 左耳把手 */
+
 .ear-left .ear-handle {
-    right: -34px;
+    left: 100%;
 
     border-radius:
         0
@@ -715,8 +792,10 @@ body {
 }
 
 
+/* 右耳把手 */
+
 .ear-right .ear-handle {
-    left: -34px;
+    right: 100%;
 
     border-radius:
         14px
@@ -747,21 +826,6 @@ body {
 
 
 /* =========================================================
-   Empty State
-========================================================= */
-
-.empty-card-state {
-    padding: 22px;
-
-    text-align: center;
-
-    color: #999;
-
-    font-size: 0.9rem;
-}
-
-
-/* =========================================================
    Visitor
 ========================================================= */
 
@@ -780,18 +844,23 @@ body {
     color:
         rgba(255, 255, 255, 0.92);
 
-    font-size: 0.9rem;
+    font-size:
+        0.9rem;
 
     border:
         1px solid
         rgba(255, 255, 255, 0.22);
 
-    border-radius: 999px;
+    border-radius:
+        999px;
 
     background:
         rgba(255, 255, 255, 0.12);
 
     backdrop-filter:
+        blur(12px);
+
+    -webkit-backdrop-filter:
         blur(12px);
 }
 
@@ -811,7 +880,8 @@ body {
     color:
         rgba(255, 255, 255, 0.72);
 
-    font-size: 0.82rem;
+    font-size:
+        0.82rem;
 
     text-align: center;
 }
@@ -845,6 +915,9 @@ body {
         rgba(10, 8, 25, 0.86);
 
     backdrop-filter:
+        blur(10px);
+
+    -webkit-backdrop-filter:
         blur(10px);
 }
 
@@ -894,17 +967,33 @@ body {
 
 
 /* =========================================================
+   Tablet
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    /*
+        当屏幕不够宽时，
+        耳朵仍然存在，
+        但宽度缩小。
+    */
+
+    :root {
+        --ear-width: 210px;
+    }
+
+}
+
+
+/* =========================================================
    Mobile
 ========================================================= */
 
 @media (max-width: 900px) {
 
     .site-shell {
-        width:
-            min(680px, calc(100% - 24px));
-
         padding:
-            28px 0
+            28px 12px
             30px;
     }
 
@@ -922,8 +1011,15 @@ body {
     }
 
 
+    /*
+        手机端不使用横向耳朵，
+        避免把主体挤到无法阅读。
+
+        JS 会把左右卡片复制到中间。
+    */
+
     .ear {
-        display: none;
+        display: none !important;
     }
 
 
@@ -931,22 +1027,12 @@ body {
         width: 100%;
     }
 
-
-    /*
-        手机端：
-        左右耳内容直接合并到中间
-    */
-
-    .mobile-ear-cards {
-        display: flex;
-
-        flex-direction: column;
-
-        gap: 20px;
-    }
-
 }
 
+
+/* =========================================================
+   Small Mobile
+========================================================= */
 
 @media (max-width: 520px) {
 
