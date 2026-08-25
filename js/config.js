@@ -1,9 +1,9 @@
 window.APP_CONFIG = {
 
     supabaseUrl:
-        "在这里填写你的 Supabase Project URL",
+        https://hjtxgmlzqmasdgzjpvja.supabase.co
 
     supabaseAnonKey:
-        "在这里填写你的 Supabase anon public key"
+        eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqdHhnbWx6cW1hc2RnempwdmphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxNjcwMzMsImV4cCI6MjA3OTc0MzAzM30.eVSVkgAdcS7XVG94SaGhmRCAhPEbFXo4ssYD0som7kA
 
 };
