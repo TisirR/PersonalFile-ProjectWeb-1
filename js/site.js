@@ -1,5 +1,5 @@
 /* =========================================================
-   State
+   Website State
 ========================================================= */
 
 const state = {
@@ -76,20 +76,22 @@ const dom = {
 
 
 /* =========================================================
-   Default Data
+   Default Profile
 ========================================================= */
 
 const defaultProfile = {
 
-    display_name: "Your Name",
+    display_name:
+        "Your Name",
 
     tagline:
         "Welcome to my personal space.",
 
     introduction:
-        "这里以后可以填写你的自我介绍。\n\n不用暴露现实中的敏感个人信息，这里更适合介绍你的兴趣、VRChat、喜欢的东西，以及想让新朋友了解的内容。",
+        "这里以后可以填写你的自我介绍。\n\n不用填写现实中的敏感个人信息，可以介绍你的兴趣、VRChat、喜欢的东西，以及你希望新朋友了解的内容。",
 
-    avatar_url: null,
+    avatar_url:
+        null,
 
     active_title:
         "Ciallo～(∠・ω< )⌒★",
@@ -99,6 +101,10 @@ const defaultProfile = {
 
 };
 
+
+/* =========================================================
+   Default Appearance
+========================================================= */
 
 const defaultAppearance = {
 
@@ -150,7 +156,7 @@ document.addEventListener(
 
 
 /* =========================================================
-   Load Website
+   Load Website Data
 ========================================================= */
 
 async function loadWebsite() {
@@ -178,9 +184,12 @@ async function loadWebsite() {
             supabaseClient
                 .from("info_cards")
                 .select("*")
-                .order("sort_order", {
-                    ascending: true
-                })
+                .order(
+                    "sort_order",
+                    {
+                        ascending: true
+                    }
+                )
 
         ]);
 
@@ -189,12 +198,15 @@ async function loadWebsite() {
             profileResult.data ||
             defaultProfile;
 
+
         state.appearance =
             appearanceResult.data ||
             defaultAppearance;
 
+
         state.cards =
-            cardsResult.data || [];
+            cardsResult.data ||
+            [];
 
 
         renderProfile();
@@ -211,13 +223,17 @@ async function loadWebsite() {
             error
         );
 
+
         state.profile =
             defaultProfile;
+
 
         state.appearance =
             defaultAppearance;
 
+
         state.cards = [];
+
 
         renderProfile();
 
@@ -272,6 +288,10 @@ function renderProfile() {
 }
 
 
+/* =========================================================
+   Avatar
+========================================================= */
+
 function renderAvatar(url) {
 
     if (!url) {
@@ -279,6 +299,7 @@ function renderAvatar(url) {
         dom.avatarImage
             .classList
             .remove("is-visible");
+
 
         dom.avatarFallback
             .style
@@ -289,7 +310,9 @@ function renderAvatar(url) {
     }
 
 
-    dom.avatarImage.src = url;
+    dom.avatarImage.src =
+        url;
+
 
     dom.avatarImage.onload =
         () => {
@@ -297,6 +320,7 @@ function renderAvatar(url) {
             dom.avatarImage
                 .classList
                 .add("is-visible");
+
 
             dom.avatarFallback
                 .style
@@ -312,6 +336,7 @@ function renderAvatar(url) {
                 .classList
                 .remove("is-visible");
 
+
             dom.avatarFallback
                 .style
                 .display = "flex";
@@ -322,14 +347,16 @@ function renderAvatar(url) {
 
 
 /* =========================================================
-   Page Title
+   Browser Title
 ========================================================= */
 
 document.addEventListener(
     "visibilitychange",
     () => {
 
-        if (!state.profile) return;
+        if (!state.profile) {
+            return;
+        }
 
 
         if (document.hidden) {
@@ -374,6 +401,10 @@ function renderAppearance() {
         `blur(${blur}px) brightness(${brightness}%)`;
 
 
+    dom.backgroundLayer.style.backgroundImage =
+        "";
+
+
     switch (
         appearance.background_type
     ) {
@@ -405,11 +436,17 @@ function renderAppearance() {
                 appearance.background_image_url
             ) {
 
+                dom.backgroundLayer.style.background =
+                    "none";
+
+
                 dom.backgroundLayer.style.backgroundImage =
                     `url("${appearance.background_image_url}")`;
 
+
                 dom.backgroundLayer.style.backgroundSize =
                     "cover";
+
 
                 dom.backgroundLayer.style.backgroundPosition =
                     "center";
@@ -430,7 +467,7 @@ function renderAppearance() {
 
 
 /* =========================================================
-   Cards
+   Render Cards
 ========================================================= */
 
 function renderCards() {
@@ -440,20 +477,6 @@ function renderCards() {
     dom.leftCards.innerHTML = "";
 
     dom.rightCards.innerHTML = "";
-
-
-    const positions = {
-
-        center:
-            dom.centerCards,
-
-        left:
-            dom.leftCards,
-
-        right:
-            dom.rightCards
-
-    };
 
 
     const groupedCards = {
@@ -484,42 +507,43 @@ function renderCards() {
     );
 
 
-    Object.entries(
+    renderCardPosition(
+        dom.centerCards,
+        groupedCards.center
+    );
+
+
+    renderCardPosition(
+        dom.leftCards,
+        groupedCards.left
+    );
+
+
+    renderCardPosition(
+        dom.rightCards,
+        groupedCards.right
+    );
+
+
+    renderMobileCards(
         groupedCards
-    ).forEach(
-
-        ([position, cards]) => {
-
-            renderCardPosition(
-                positions[position],
-                cards
-            );
-
-        }
-
-    );
-
-
-    updateEarVisibility(
-        groupedCards.left,
-        groupedCards.right
-    );
-
-
-    setupMobileCards(
-        groupedCards.left,
-        groupedCards.right
     );
 
 }
 
+
+/* =========================================================
+   Render One Position
+========================================================= */
 
 function renderCardPosition(
     container,
     cards
 ) {
 
-    if (!container) return;
+    if (!container) {
+        return;
+    }
 
 
     let index = 0;
@@ -534,12 +558,19 @@ function renderCardPosition(
 
 
         if (
-            card.display_style === "connected" &&
+
+            card.display_style ===
+            "connected"
+
+            &&
+
             card.group_id
+
         ) {
 
             const group =
                 document.createElement("div");
+
 
             group.className =
                 "card-group";
@@ -551,11 +582,15 @@ function renderCardPosition(
 
             while (
 
-                index < cards.length &&
+                index < cards.length
+
+                &&
 
                 cards[index]
                     .display_style ===
-                    "connected" &&
+                    "connected"
+
+                &&
 
                 cards[index]
                     .group_id ===
@@ -584,7 +619,9 @@ function renderCardPosition(
         else {
 
             container.appendChild(
+
                 createCard(card)
+
             );
 
             index++;
@@ -596,10 +633,16 @@ function renderCardPosition(
 }
 
 
+/* =========================================================
+   Create Card
+========================================================= */
+
 function createCard(card) {
 
     const element =
-        document.createElement("article");
+        document.createElement(
+            "article"
+        );
 
 
     element.className =
@@ -607,61 +650,46 @@ function createCard(card) {
 
 
     const title =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     title.className =
         "card-title-bubble";
 
+
     title.textContent =
-        card.title || "Untitled";
+        card.title ||
+        "Untitled";
 
 
     const content =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     content.className =
         "card-content";
 
+
     content.textContent =
-        card.content || "";
+        card.content ||
+        "";
 
 
-    element.appendChild(title);
+    element.appendChild(
+        title
+    );
 
-    element.appendChild(content);
+
+    element.appendChild(
+        content
+    );
 
 
     return element;
-
-}
-
-
-/* =========================================================
-   Ear Visibility
-========================================================= */
-
-function updateEarVisibility(
-    leftCards,
-    rightCards
-) {
-
-    const hasLeft =
-        leftCards.length > 0;
-
-    const hasRight =
-        rightCards.length > 0;
-
-
-    dom.leftEar.style.display =
-        hasLeft
-            ? "block"
-            : "none";
-
-
-    dom.rightEar.style.display =
-        hasRight
-            ? "block"
-            : "none";
 
 }
 
@@ -685,12 +713,9 @@ function setupEarControls() {
 
 
     if (
-        leftState === "expanded"
+        leftState ===
+        "expanded"
     ) {
-
-        dom.leftEar
-            .classList
-            .remove("collapsed");
 
         dom.leftEar
             .classList
@@ -700,12 +725,9 @@ function setupEarControls() {
 
 
     if (
-        rightState === "expanded"
+        rightState ===
+        "expanded"
     ) {
-
-        dom.rightEar
-            .classList
-            .remove("collapsed");
 
         dom.rightEar
             .classList
@@ -742,6 +764,10 @@ function setupEarControls() {
 }
 
 
+/* =========================================================
+   Toggle Ear
+========================================================= */
+
 function toggleEar(
     ear,
     storageKey
@@ -757,11 +783,9 @@ function toggleEar(
 
         ear
             .classList
-            .remove("expanded");
-
-        ear
-            .classList
-            .add("collapsed");
+            .remove(
+                "expanded"
+            );
 
 
         localStorage.setItem(
@@ -774,11 +798,9 @@ function toggleEar(
 
         ear
             .classList
-            .remove("collapsed");
-
-        ear
-            .classList
-            .add("expanded");
+            .add(
+                "expanded"
+            );
 
 
         localStorage.setItem(
@@ -793,31 +815,40 @@ function toggleEar(
 
 /* =========================================================
    Mobile Cards
+
+   手机端左右耳朵不显示，
+   但左右卡片会复制到中间。
+
+   这样不会丢失内容。
 ========================================================= */
 
-function setupMobileCards(
-    leftCards,
-    rightCards
+function renderMobileCards(
+    groupedCards
 ) {
 
     if (
         window.innerWidth > 900
-    ) return;
+    ) {
+        return;
+    }
 
 
-    const allCards = [
+    const mobileCards = [
 
-        ...leftCards,
-        ...rightCards
+        ...groupedCards.left,
+
+        ...groupedCards.right
 
     ];
 
 
-    allCards.forEach(
+    mobileCards.forEach(
         card => {
 
             dom.centerCards.appendChild(
+
                 createCard(card)
+
             );
 
         }
@@ -827,7 +858,7 @@ function setupMobileCards(
 
 
 /* =========================================================
-   Image Viewer
+   Avatar Viewer
 ========================================================= */
 
 function setupImageViewer() {
@@ -838,7 +869,9 @@ function setupImageViewer() {
 
             if (
                 !state.profile?.avatar_url
-            ) return;
+            ) {
+                return;
+            }
 
 
             dom.viewerImage.src =
@@ -877,6 +910,10 @@ function setupImageViewer() {
 }
 
 
+/* =========================================================
+   Close Image Viewer
+========================================================= */
+
 function closeImageViewer() {
 
     dom.imageViewer.hidden =
@@ -886,7 +923,7 @@ function closeImageViewer() {
 
 
 /* =========================================================
-   Visitor
+   Visitor Counter
 ========================================================= */
 
 async function updateVisitor() {
@@ -904,6 +941,7 @@ async function updateVisitor() {
             visitorId =
                 crypto.randomUUID();
 
+
             localStorage.setItem(
                 "vrc_site_visitor_id",
                 visitorId
@@ -913,11 +951,16 @@ async function updateVisitor() {
 
 
         const {
-            data: existingVisitor
+            data: existingVisitor,
+            error: visitorCheckError
         } =
         await supabaseClient
-            .from("visitor_sessions")
-            .select("visitor_id")
+            .from(
+                "visitor_sessions"
+            )
+            .select(
+                "visitor_id"
+            )
             .eq(
                 "visitor_id",
                 visitorId
@@ -925,24 +968,51 @@ async function updateVisitor() {
             .maybeSingle();
 
 
-        if (!existingVisitor) {
+        if (
+            visitorCheckError
+        ) {
 
+            throw visitorCheckError;
+
+        }
+
+
+        if (
+            !existingVisitor
+        ) {
+
+            const {
+                error
+            } =
             await supabaseClient
-                .from("visitor_sessions")
+                .from(
+                    "visitor_sessions"
+                )
                 .insert({
+
                     visitor_id:
                         visitorId
+
                 });
+
+
+            if (error) {
+                throw error;
+            }
 
         }
         else {
 
             await supabaseClient
-                .from("visitor_sessions")
+                .from(
+                    "visitor_sessions"
+                )
                 .update({
+
                     last_seen_at:
                         new Date()
                             .toISOString()
+
                 })
                 .eq(
                     "visitor_id",
@@ -954,10 +1024,12 @@ async function updateVisitor() {
 
         const {
             count,
-            error
+            error: countError
         } =
         await supabaseClient
-            .from("visitor_sessions")
+            .from(
+                "visitor_sessions"
+            )
             .select(
                 "*",
                 {
@@ -967,9 +1039,11 @@ async function updateVisitor() {
             );
 
 
-        if (error) {
+        if (
+            countError
+        ) {
 
-            throw error;
+            throw countError;
 
         }
 
@@ -984,6 +1058,7 @@ async function updateVisitor() {
             "访客统计失败:",
             error
         );
+
 
         dom.visitorCount.textContent =
             "—";
