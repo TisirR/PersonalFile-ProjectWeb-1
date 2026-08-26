@@ -1105,216 +1105,930 @@ body {
 }
 
 /* =========================================================
-   2026-08 Ear + Gallery Revision
+   Ear + Gallery Revision
+   最终定位逻辑
+========================================================= */
+
+:root {
+
+    /*
+        主框之间原本的间隔是 28px。
+        耳朵与第二主框之间也使用同样的距离。
+    */
+    --panel-gap: 28px;
+
+}
+
+
+/* =========================================================
+   左右耳朵
+========================================================= */
+
+.ear {
+
+    position: absolute;
+
+    top: 0;
+
+    z-index: 8;
+
+    width: var(--ear-width);
+
+    min-height: 150px;
+
+    height: auto;
+
+    overflow: visible;
+
+    transform: none !important;
+
+}
+
+
+/*
+    左耳：
+
+    [ 左耳 ]   28px空隙   [ 主框 ]
+*/
+.ear-left {
+
+    right:
+        calc(
+            100% +
+            var(--panel-gap)
+        );
+
+}
+
+
+/*
+    右耳：
+
+    [ 主框 ]   28px空隙   [ 右耳 ]
+*/
+.ear-right {
+
+    left:
+        calc(
+            100% +
+            var(--panel-gap)
+        );
+
+}
+
+
+/* =========================================================
+   耳朵内容本体
+========================================================= */
+
+.ear-content {
+
+    position: relative;
+
+    width: 100%;
+
+    min-height: 150px;
+
+    max-height:
+        calc(
+            100vh -
+            100px
+        );
+
+    padding:
+        30px
+        22px;
+
+    overflow-y: auto;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.88
+        );
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.75
+        );
+
+    /*
+        改成和主框一样的圆角方框
+    */
+    border-radius:
+        var(--radius-large);
+
+    box-shadow:
+        0 15px 45px
+        rgba(
+            30,
+            20,
+            70,
+            0.14
+        );
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    transition:
+
+        transform
+        var(--transition),
+
+        opacity
+        var(--transition),
+
+        visibility
+        var(--transition);
+
+}
+
+
+/* =========================================================
+   左耳动画
 ========================================================= */
 
 /*
-   关键逻辑：耳朵本体永远在中间主框外侧，按钮不参与滑动。
-   收起/展开的只有 ear-content，因此按钮位置始终固定。
+    收起：
+
+    左耳向左退回去。
+    完全不会经过中间主框。
 */
-.ear {
-    top: 0;
-    bottom: auto;
-    z-index: 2;
-    width: var(--ear-width);
-    min-height: 150px;
-    height: auto;
-    overflow: visible;
-    transform: none !important;
-    transition: none;
-}
-
-.ear-left { right: 100%; }
-.ear-right { left: 100%; }
-
+.ear-left.collapsed
 .ear-content {
-    position: relative;
-    width: 100%;
-    min-height: 150px;
-    max-height: calc(100vh - 120px);
-    padding: 30px 22px;
-    overflow-y: auto;
-    background: rgba(255, 255, 255, 0.88);
-    border: 1px solid rgba(255, 255, 255, 0.75);
-    box-shadow: 0 15px 45px rgba(30, 20, 70, 0.12);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    transition: transform var(--transition), opacity var(--transition), visibility var(--transition);
-}
 
-.ear-left .ear-content {
-    border-right: none;
-    border-radius: var(--radius-large) 0 0 var(--radius-large);
-    transform: translateX(100%);
-}
+    transform:
+        translateX(
+            calc(
+                -100% -
+                12px
+            )
+        );
 
-.ear-right .ear-content {
-    border-left: none;
-    border-radius: 0 var(--radius-large) var(--radius-large) 0;
-    transform: translateX(-100%);
-}
-
-.ear.collapsed .ear-content {
     opacity: 0;
+
     visibility: hidden;
+
     pointer-events: none;
+
 }
 
-.ear.expanded .ear-content {
-    transform: translateX(0);
+
+/*
+    展开：
+
+    从左侧弹出。
+*/
+.ear-left.expanded
+.ear-content {
+
+    transform:
+        translateX(0);
+
     opacity: 1;
+
     visibility: visible;
+
     pointer-events: auto;
+
 }
 
-/* 按钮固定在主框两侧，不随耳朵内容移动 */
+
+/* =========================================================
+   右耳动画
+========================================================= */
+
+/*
+    收起：
+
+    向右侧退回。
+*/
+.ear-right.collapsed
+.ear-content {
+
+    transform:
+        translateX(
+            calc(
+                100% +
+                12px
+            )
+        );
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+}
+
+
+/*
+    展开
+*/
+.ear-right.expanded
+.ear-content {
+
+    transform:
+        translateX(0);
+
+    opacity: 1;
+
+    visibility: visible;
+
+    pointer-events: auto;
+
+}
+
+
+/* =========================================================
+   耳朵把手
+========================================================= */
+
 .ear-handle {
+
+    position: absolute;
+
     top: 76px;
-    z-index: 8;
-    transition: width var(--transition), box-shadow var(--transition), background var(--transition);
+
+    z-index: 20;
+
+    width:
+        var(--ear-handle-width);
+
+    height: 76px;
+
+    padding: 0;
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.28
+        );
+
+    cursor: pointer;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            180deg,
+            #7657e8,
+            #9b72f3
+        );
+
+    box-shadow:
+        0 8px 20px
+        rgba(
+            80,
+            55,
+            170,
+            0.30
+        );
+
+    transition:
+
+        width
+        var(--transition),
+
+        transform
+        var(--transition),
+
+        box-shadow
+        var(--transition);
+
 }
 
-.ear-left .ear-handle { left: 100%; }
-.ear-right .ear-handle { right: 100%; }
 
-/* 紫色标题气泡真正占据卡片顶部空间，长标题自动换行并推开正文 */
+/*
+    左耳按钮：
+
+    跟着左耳，
+    位于左耳右边缘。
+*/
+.ear-left
+.ear-handle {
+
+    left: 100%;
+
+    border-radius:
+        0
+        14px
+        14px
+        0;
+
+}
+
+
+/*
+    右耳按钮：
+
+    跟着右耳，
+    位于右耳左边缘。
+*/
+.ear-right
+.ear-handle {
+
+    right: 100%;
+
+    border-radius:
+        14px
+        0
+        0
+        14px;
+
+}
+
+
+.ear-handle:hover {
+
+    width: 42px;
+
+    box-shadow:
+        0 12px 26px
+        rgba(
+            80,
+            55,
+            170,
+            0.42
+        );
+
+}
+
+
+.ear-arrow {
+
+    display: block;
+
+    transition:
+        transform
+        var(--transition);
+
+}
+
+
+.ear-left.expanded
+.ear-arrow {
+
+    transform:
+        rotate(180deg);
+
+}
+
+
+.ear-right.expanded
+.ear-arrow {
+
+    transform:
+        rotate(180deg);
+
+}
+
+
+/* =========================================================
+   紫色标题气泡
+   标题必须占据真实布局空间
+========================================================= */
+
 .info-card {
-    padding: 0 24px 24px;
+
+    padding:
+        0
+        24px
+        24px;
+
 }
 
-.info-card .card-title-bubble {
+
+.info-card
+.card-title-bubble {
+
     position: relative;
+
     top: auto;
+
     left: auto;
+
+    display: inline-flex;
+
     width: fit-content;
-    max-width: calc(100% - 8px);
+
+    max-width:
+        calc(
+            100% -
+            8px
+        );
+
     min-height: 34px;
-    margin: -15px 0 18px 0;
+
+    margin:
+        -15px
+        0
+        18px
+        0;
+
     white-space: normal;
+
     overflow-wrap: anywhere;
+
     line-height: 1.35;
+
 }
 
-.card-content {
-    min-width: 0;
-}
 
-/* 右侧活动画廊：随页面滚动保持在视野中，起始高度由 JS 对齐第二主框顶部 */
+/* =========================================================
+   Gallery
+========================================================= */
+
 .gallery-panel {
-    --gallery-width: clamp(280px, 22vw, 380px);
+
+    /*
+        宽度保持在右侧空白区域，
+        不侵入右耳区域。
+    */
+    --gallery-width:
+        clamp(
+            250px,
+            17vw,
+            320px
+        );
+
     position: fixed;
-    top: var(--gallery-top, 280px);
+
+    top:
+        var(
+            --gallery-top,
+            280px
+        );
+
     right: 24px;
-    z-index: 5;
-    width: var(--gallery-width);
-    max-height: calc(100vh - var(--gallery-top, 280px) - 28px);
-    padding: 34px 16px 16px;
-    overflow-y: auto;
-    background: rgba(255,255,255,0.88);
-    border: 1px solid rgba(255,255,255,0.75);
-    border-radius: var(--radius-large);
-    box-shadow: 0 15px 45px rgba(30,20,70,0.14);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+
+    z-index: 12;
+
+    width:
+        var(--gallery-width);
+
+    overflow: visible;
+
 }
+
+
+/*
+    画廊真正的内容框
+*/
+.gallery-content {
+
+    position: relative;
+
+    width: 100%;
+
+    max-height:
+        calc(
+            100vh -
+            var(
+                --gallery-top,
+                280px
+            ) -
+            24px
+        );
+
+    padding:
+        34px
+        16px
+        16px;
+
+    overflow-y: auto;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.88
+        );
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.75
+        );
+
+    border-radius:
+        var(--radius-large);
+
+    box-shadow:
+        0 15px 45px
+        rgba(
+            30,
+            20,
+            70,
+            0.14
+        );
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    transition:
+
+        transform
+        var(--transition),
+
+        opacity
+        var(--transition),
+
+        visibility
+        var(--transition);
+
+}
+
+
+/*
+    画廊收起：
+
+    内容往右侧退回，
+    只留下把手。
+*/
+.gallery-panel.collapsed
+.gallery-content {
+
+    transform:
+        translateX(
+            calc(
+                100% +
+                12px
+            )
+        );
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+}
+
+
+.gallery-panel.expanded
+.gallery-content {
+
+    transform:
+        translateX(0);
+
+    opacity: 1;
+
+    visibility: visible;
+
+    pointer-events: auto;
+
+}
+
+
+/* =========================================================
+   Gallery Handle
+========================================================= */
+
+.gallery-handle {
+
+    position: absolute;
+
+    top: 76px;
+
+    right: 100%;
+
+    z-index: 20;
+
+    width:
+        var(--ear-handle-width);
+
+    height: 76px;
+
+    padding: 0;
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.28
+        );
+
+    border-radius:
+        14px
+        0
+        0
+        14px;
+
+    cursor: pointer;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            180deg,
+            #7657e8,
+            #9b72f3
+        );
+
+    box-shadow:
+        0 8px 20px
+        rgba(
+            80,
+            55,
+            170,
+            0.30
+        );
+
+    transition:
+
+        width
+        var(--transition),
+
+        box-shadow
+        var(--transition);
+
+}
+
+
+.gallery-handle:hover {
+
+    width: 42px;
+
+    box-shadow:
+        0 12px 26px
+        rgba(
+            80,
+            55,
+            170,
+            0.42
+        );
+
+}
+
+
+.gallery-arrow {
+
+    display: block;
+
+    transition:
+        transform
+        var(--transition);
+
+}
+
+
+.gallery-panel.expanded
+.gallery-arrow {
+
+    transform:
+        rotate(180deg);
+
+}
+
+
+/* =========================================================
+   Gallery Title
+========================================================= */
 
 .gallery-title-bubble {
+
     position: absolute;
+
     top: -15px;
+
     left: 22px;
+
     display: inline-flex;
+
     align-items: center;
+
     min-height: 34px;
-    padding: 5px 16px;
-    color: #fff;
-    font-size: .88rem;
+
+    padding:
+        5px
+        16px;
+
+    color: white;
+
+    font-size: 0.88rem;
+
     font-weight: 700;
+
     border-radius: 999px;
-    background: linear-gradient(135deg, #7657e8, #9b72f3);
-    box-shadow: 0 7px 18px rgba(90,60,180,.25);
+
+    background:
+        linear-gradient(
+            135deg,
+            #7657e8,
+            #9b72f3
+        );
+
+    box-shadow:
+        0 7px 18px
+        rgba(
+            90,
+            60,
+            180,
+            0.25
+        );
+
 }
+
+
+/* =========================================================
+   Gallery Items
+========================================================= */
 
 .gallery-list {
+
     display: flex;
+
     flex-direction: column;
+
     gap: 12px;
+
 }
+
 
 .gallery-item {
+
     display: grid;
-    grid-template-columns: minmax(108px, 38%) 1fr;
-    gap: 14px;
-    min-height: 108px;
+
+    grid-template-columns:
+        minmax(
+            96px,
+            38%
+        )
+        1fr;
+
+    gap: 12px;
+
+    min-height: 96px;
+
     padding: 10px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-medium);
-    background: rgba(255,255,255,.58);
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        var(--radius-medium);
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.58
+        );
+
 }
+
 
 .gallery-thumb {
+
     width: 100%;
+
     height: 100%;
-    min-height: 88px;
+
+    min-height: 76px;
+
     object-fit: cover;
-    border: 0;
-    border-radius: var(--radius-small);
+
+    border-radius:
+        var(--radius-small);
+
     cursor: pointer;
-    background: rgba(118,87,232,.08);
+
+    background:
+        rgba(
+            118,
+            87,
+            232,
+            0.08
+        );
+
 }
+
 
 .gallery-info {
+
     min-width: 0;
+
     display: flex;
+
     flex-direction: column;
+
     justify-content: center;
-    gap: 7px;
+
+    gap: 6px;
+
 }
+
 
 .gallery-name {
-    color: var(--text);
+
+    color:
+        var(--text);
+
     font-weight: 750;
-    font-size: .95rem;
+
+    font-size: 0.92rem;
+
     overflow-wrap: anywhere;
+
 }
+
 
 .gallery-description {
-    color: var(--text-soft);
-    font-size: .82rem;
-    line-height: 1.55;
+
+    color:
+        var(--text-soft);
+
+    font-size: 0.78rem;
+
+    line-height: 1.5;
+
     white-space: pre-wrap;
+
     overflow-wrap: anywhere;
+
 }
+
 
 .gallery-map {
+
     display: inline-flex;
+
     align-items: center;
+
     gap: 6px;
+
     width: fit-content;
+
     max-width: 100%;
-    color: var(--purple);
-    font-size: .8rem;
+
+    color:
+        var(--purple);
+
+    font-size: 0.76rem;
+
     font-weight: 650;
+
     overflow-wrap: anywhere;
+
 }
 
-.gallery-map::before { content: "⌖"; color: var(--purple); }
 
-.gallery-empty {
-    min-height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: var(--text-soft);
-    border: 1px dashed var(--border);
-    border-radius: var(--radius-medium);
-    background: rgba(255,255,255,.4);
+.gallery-map::before {
+
+    content: "⌖";
+
+    color:
+        var(--purple);
+
 }
+
+
+/* =========================================================
+   Responsive
+========================================================= */
 
 @media (max-width: 1450px) {
-    .gallery-panel { display: none; }
+
+    .gallery-panel {
+
+        display: none;
+
+    }
+
 }
 
+
 @media (max-width: 900px) {
-    .gallery-panel { display: none; }
+
+    .ear {
+
+        display: none !important;
+
+    }
+
 }
