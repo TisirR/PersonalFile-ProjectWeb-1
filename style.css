@@ -1,0 +1,1320 @@
+/* =========================================================
+   Root
+========================================================= */
+
+:root {
+    --bg-1: #667eea;
+    --bg-2: #764ba2;
+
+    /*
+        上方 Profile
+        与下方中间主体共用的宽度
+    */
+    --main-content-width: 760px;
+
+    /*
+        左右耳朵展开宽度
+    */
+    --ear-width: 260px;
+
+    /*
+        收起状态露出的耳朵宽度
+    */
+    --ear-handle-width: 34px;
+
+    --panel: rgba(255, 255, 255, 0.92);
+    --panel-strong: rgba(255, 255, 255, 0.97);
+
+    --text: #2c2c34;
+    --text-soft: #6d6d78;
+
+    --purple: #7657e8;
+    --purple-soft: #a685ff;
+
+    --border: rgba(110, 80, 190, 0.16);
+
+    --shadow:
+        0 20px 60px rgba(30, 20, 70, 0.16);
+
+    --radius-large: 28px;
+    --radius-medium: 20px;
+    --radius-small: 14px;
+
+    --transition:
+        0.38s cubic-bezier(.2, .8, .2, 1);
+}
+
+
+/* =========================================================
+   Reset
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+
+html {
+    min-height: 100%;
+}
+
+
+body {
+    margin: 0;
+
+    min-width: 320px;
+    min-height: 100vh;
+
+    color: var(--text);
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Microsoft YaHei",
+        sans-serif;
+
+    overflow-x: hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--bg-1),
+            var(--bg-2)
+        );
+}
+
+
+/* =========================================================
+   Background
+========================================================= */
+
+#backgroundLayer {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: -2;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--bg-1),
+            var(--bg-2)
+        );
+
+    background-size: cover;
+    background-position: center;
+
+    transform: scale(1.03);
+
+    transition:
+        background var(--transition),
+        filter var(--transition);
+}
+
+
+#backgroundLayer::after {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(255, 255, 255, 0.18),
+            transparent 45%
+        ),
+
+        radial-gradient(
+            circle at 80% 70%,
+            rgba(255, 255, 255, 0.12),
+            transparent 45%
+        );
+}
+
+
+/* =========================================================
+   Site Shell
+========================================================= */
+
+.site-shell {
+    width: 100%;
+
+    margin: 0 auto;
+
+    padding:
+        56px 16px
+        40px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 28px;
+}
+
+
+/* =========================================================
+   Profile Panel
+
+   宽度 = 中间主体
+========================================================= */
+
+.profile-panel {
+    width:
+        min(
+            var(--main-content-width),
+            100%
+        );
+
+    padding:
+        38px
+        42px
+        42px;
+
+    text-align: center;
+
+    background:
+        var(--panel);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.8);
+
+    border-radius:
+        var(--radius-large);
+
+    box-shadow:
+        var(--shadow);
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+}
+
+
+/* =========================================================
+   Avatar
+========================================================= */
+
+.avatar-wrap {
+    display: flex;
+
+    justify-content: center;
+
+    margin-bottom: 16px;
+}
+
+
+.avatar-button {
+    position: relative;
+
+    width: 132px;
+    height: 132px;
+
+    padding: 5px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    cursor: pointer;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--purple),
+            var(--purple-soft)
+        );
+
+    box-shadow:
+        0 10px 28px
+        rgba(100, 70, 200, 0.32);
+
+    transition:
+        transform var(--transition),
+        box-shadow var(--transition);
+}
+
+
+.avatar-button:hover {
+    transform:
+        translateY(-4px)
+        scale(1.02);
+
+    box-shadow:
+        0 18px 38px
+        rgba(100, 70, 200, 0.42);
+}
+
+
+.avatar-image,
+.avatar-fallback {
+    width: 100%;
+    height: 100%;
+
+    border-radius: 50%;
+}
+
+
+.avatar-image {
+    display: none;
+
+    object-fit: cover;
+
+    background: white;
+}
+
+
+.avatar-image.is-visible {
+    display: block;
+}
+
+
+.avatar-fallback {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+
+    font-size: 2.2rem;
+
+    font-weight: 700;
+
+    background:
+        linear-gradient(
+            135deg,
+            #667eea,
+            #764ba2
+        );
+}
+
+
+/* =========================================================
+   Profile Text
+========================================================= */
+
+.display-name {
+    margin:
+        0 0 8px;
+
+    font-size:
+        clamp(2rem, 6vw, 3.2rem);
+
+    line-height: 1.1;
+
+    font-weight: 750;
+
+    letter-spacing: -0.04em;
+}
+
+
+.tagline {
+    margin:
+        0 auto 30px;
+
+    max-width: 560px;
+
+    color:
+        var(--purple);
+
+    font-size:
+        1rem;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   About
+========================================================= */
+
+.about-section {
+    position: relative;
+
+    margin-top: 18px;
+
+    padding:
+        38px 30px
+        28px;
+
+    text-align: left;
+
+    background:
+        rgba(255, 255, 255, 0.62);
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        var(--radius-medium);
+}
+
+
+.section-title-bubble,
+.card-title-bubble {
+    position: absolute;
+
+    top: -15px;
+    left: 24px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    min-height: 34px;
+
+    padding:
+        5px 16px;
+
+    color: white;
+
+    font-size: 0.88rem;
+
+    font-weight: 700;
+
+    border-radius: 999px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7657e8,
+            #9b72f3
+        );
+
+    box-shadow:
+        0 7px 18px
+        rgba(90, 60, 180, 0.25);
+}
+
+
+.about-content {
+    color:
+        var(--text-soft);
+
+    white-space: pre-wrap;
+
+    line-height: 1.9;
+
+    font-size: 0.98rem;
+}
+
+
+/* =========================================================
+   Information Shell
+
+   这是整个耳朵系统的核心。
+
+   外层不再是 Flex 三栏，
+   而是一个固定中间主体，
+   左右耳朵绝对定位到主体背后。
+
+   所以：
+   耳朵展开不会压缩中间主体。
+========================================================= */
+
+.information-shell {
+    position: relative;
+
+    width:
+        min(
+            var(--main-content-width),
+            100%
+        );
+
+    isolation: isolate;
+}
+
+
+/* =========================================================
+   Main Information Panel
+========================================================= */
+
+.information-main {
+    position: relative;
+
+    z-index: 3;
+
+    width: 100%;
+
+    min-height: 240px;
+
+    padding: 30px;
+
+    background:
+        var(--panel);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.8);
+
+    border-radius:
+        var(--radius-large);
+
+    box-shadow:
+        var(--shadow);
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+}
+
+
+/* =========================================================
+   Cards
+========================================================= */
+
+.cards-column {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+
+.info-card {
+    position: relative;
+
+    padding:
+        34px 24px
+        24px;
+
+    background:
+        rgba(255, 255, 255, 0.72);
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        var(--radius-medium);
+
+    overflow: visible;
+
+    transition:
+        transform var(--transition),
+        box-shadow var(--transition);
+}
+
+
+.info-card:hover {
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 12px 28px
+        rgba(50, 30, 110, 0.12);
+}
+
+
+.info-card .card-title-bubble {
+    top: -15px;
+
+    left: 18px;
+}
+
+
+.card-content {
+    color:
+        var(--text-soft);
+
+    white-space: pre-wrap;
+
+    line-height: 1.8;
+
+    font-size: 0.95rem;
+}
+
+
+/* =========================================================
+   Connected Cards
+========================================================= */
+
+.card-group {
+    overflow: visible;
+
+    border-radius:
+        var(--radius-medium);
+}
+
+
+.card-group .info-card {
+    border-radius: 0;
+
+    margin: 0;
+
+    border-bottom: none;
+}
+
+
+.card-group .info-card:first-child {
+    border-radius:
+        var(--radius-medium)
+        var(--radius-medium)
+        0
+        0;
+}
+
+
+.card-group .info-card:last-child {
+    border-radius:
+        0
+        0
+        var(--radius-medium)
+        var(--radius-medium);
+
+    border-bottom:
+        1px solid
+        var(--border);
+}
+
+
+/* =========================================================
+   Ears Base
+
+   默认状态：
+   耳朵藏在主体后面，只露出展开按钮。
+
+   关键：
+   耳朵不再使用 top + bottom 绑定高度。
+   高度完全由自己的内容决定，内容多了才向上下延长。
+========================================================= */
+
+.ear {
+    position: absolute;
+
+    top: 50%;
+    bottom: auto;
+
+    z-index: 4;
+
+    width:
+        var(--ear-width);
+
+    min-height: 150px;
+
+    height: auto;
+
+    overflow: visible;
+
+    transition:
+        transform var(--transition);
+}
+
+
+/* =========================================================
+   Ear Content
+========================================================= */
+
+.ear-content {
+    width: 100%;
+
+    min-height: 150px;
+
+    max-height:
+        calc(100vh - 120px);
+
+    padding:
+        30px 22px;
+
+    overflow-y: auto;
+
+    background:
+        rgba(255, 255, 255, 0.88);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.75);
+
+    box-shadow:
+        0 15px 45px
+        rgba(30, 20, 70, 0.12);
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+}
+
+
+/* =========================================================
+   Left Ear
+========================================================= */
+
+.ear-left {
+    right: 100%;
+
+    border-radius:
+        var(--radius-large)
+        0
+        0
+        var(--radius-large);
+
+    transform:
+        translate(
+            calc(
+                100% -
+                var(--ear-handle-width)
+            ),
+            -50%
+        );
+}
+
+
+.ear-left .ear-content {
+    border-right: none;
+
+    border-radius:
+        var(--radius-large)
+        0
+        0
+        var(--radius-large);
+}
+
+
+.ear-left.expanded {
+    transform:
+        translate(
+            0,
+            -50%
+        );
+}
+
+
+/* =========================================================
+   Right Ear
+========================================================= */
+
+.ear-right {
+    left: 100%;
+
+    border-radius:
+        0
+        var(--radius-large)
+        var(--radius-large)
+        0;
+
+    transform:
+        translate(
+            calc(
+                -100% +
+                var(--ear-handle-width)
+            ),
+            -50%
+        );
+}
+
+
+.ear-right .ear-content {
+    border-left: none;
+
+    border-radius:
+        0
+        var(--radius-large)
+        var(--radius-large)
+        0;
+}
+
+
+.ear-right.expanded {
+    transform:
+        translate(
+            0,
+            -50%
+        );
+}
+
+
+/* =========================================================
+   Ear Handle
+
+   把手始终露在主体两侧。
+========================================================= */
+
+.ear-handle {
+    position: absolute;
+
+    top: 50%;
+
+    z-index: 10;
+
+    width:
+        var(--ear-handle-width);
+
+    height: 76px;
+
+    padding: 0;
+
+    border: none;
+
+    cursor: pointer;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            180deg,
+            #7657e8,
+            #9b72f3
+        );
+
+    box-shadow:
+        0 8px 20px
+        rgba(80, 55, 170, 0.28);
+
+    transform:
+        translateY(-50%);
+
+    transition:
+        width var(--transition),
+        transform var(--transition);
+}
+
+
+.ear-handle:hover {
+    width: 42px;
+}
+
+
+/* 左耳把手 */
+
+.ear-left .ear-handle {
+    left: 100%;
+
+    border-radius:
+        0
+        14px
+        14px
+        0;
+}
+
+
+/* 右耳把手 */
+
+.ear-right .ear-handle {
+    right: 100%;
+
+    border-radius:
+        14px
+        0
+        0
+        14px;
+}
+
+
+.ear-arrow {
+    display: block;
+
+    transition:
+        transform var(--transition);
+}
+
+
+.ear-left.expanded .ear-arrow {
+    transform:
+        rotate(180deg);
+}
+
+
+.ear-right.expanded .ear-arrow {
+    transform:
+        rotate(180deg);
+}
+
+
+/* =========================================================
+   Visitor
+========================================================= */
+
+.visitor-box {
+    position: fixed;
+
+    right: 24px;
+    bottom: 24px;
+
+    z-index: 20;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 9px;
+
+    padding:
+        12px 20px;
+
+    color:
+        rgba(255, 255, 255, 0.92);
+
+    font-size:
+        0.9rem;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.22);
+
+    border-radius:
+        999px;
+
+    background:
+        rgba(255, 255, 255, 0.14);
+
+    backdrop-filter:
+        blur(12px);
+
+    -webkit-backdrop-filter:
+        blur(12px);
+
+    box-shadow:
+        0 10px 30px
+        rgba(20, 10, 60, 0.18);
+}
+
+
+.visitor-box strong {
+    color: white;
+
+    font-size: 1.05rem;
+}
+
+
+/* =========================================================
+   Footer
+========================================================= */
+
+.site-footer {
+    color:
+        rgba(255, 255, 255, 0.72);
+
+    font-size:
+        0.82rem;
+
+    text-align: center;
+}
+
+
+.footer-dot {
+    margin:
+        0 8px;
+}
+
+
+/* =========================================================
+   Image Viewer
+========================================================= */
+
+.image-viewer {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 100;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px;
+
+    background:
+        rgba(10, 8, 25, 0.86);
+
+    backdrop-filter:
+        blur(10px);
+
+    -webkit-backdrop-filter:
+        blur(10px);
+}
+
+
+.image-viewer[hidden] {
+    display: none;
+}
+
+
+.image-viewer img {
+    max-width: 95vw;
+    max-height: 90vh;
+
+    border-radius:
+        var(--radius-medium);
+
+    object-fit: contain;
+
+    box-shadow:
+        0 20px 80px
+        rgba(0, 0, 0, 0.5);
+}
+
+
+.image-viewer-close {
+    position: fixed;
+
+    top: 24px;
+    right: 28px;
+
+    width: 46px;
+    height: 46px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    cursor: pointer;
+
+    color: white;
+
+    font-size: 2rem;
+
+    background:
+        rgba(255, 255, 255, 0.16);
+}
+
+
+/* =========================================================
+   Tablet
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    /*
+        当屏幕不够宽时，
+        耳朵仍然存在，
+        但宽度缩小。
+    */
+
+    :root {
+        --ear-width: 210px;
+    }
+
+}
+
+
+/* =========================================================
+   Mobile
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .site-shell {
+        padding:
+            28px 12px
+            30px;
+    }
+
+
+    .profile-panel {
+        padding:
+            32px
+            22px
+            30px;
+    }
+
+
+    .information-main {
+        padding: 22px;
+    }
+
+
+    /*
+        手机端不使用横向耳朵，
+        避免把主体挤到无法阅读。
+
+        JS 会把左右卡片复制到中间。
+    */
+
+    .ear {
+        display: none !important;
+    }
+
+
+    .information-shell {
+        width: 100%;
+    }
+
+}
+
+
+/* =========================================================
+   Small Mobile
+========================================================= */
+
+@media (max-width: 520px) {
+
+    .display-name {
+        font-size: 2rem;
+    }
+
+
+    .avatar-button {
+        width: 112px;
+        height: 112px;
+    }
+
+
+    .about-section {
+        padding:
+            34px 20px
+            22px;
+    }
+
+
+    .information-main {
+        padding: 18px;
+    }
+
+
+    .info-card {
+        padding:
+            32px 18px
+            20px;
+    }
+
+
+    .visitor-box {
+        right: 14px;
+        bottom: 14px;
+
+        padding:
+            10px 16px;
+
+        font-size:
+            0.82rem;
+    }
+
+}
+
+/* =========================================================
+   2026-08 Ear + Gallery Revision
+========================================================= */
+
+/*
+   关键逻辑：耳朵本体永远在中间主框外侧，按钮不参与滑动。
+   收起/展开的只有 ear-content，因此按钮位置始终固定。
+*/
+.ear {
+    top: 0;
+    bottom: auto;
+    z-index: 2;
+    width: var(--ear-width);
+    min-height: 150px;
+    height: auto;
+    overflow: visible;
+    transform: none !important;
+    transition: none;
+}
+
+.ear-left { right: 100%; }
+.ear-right { left: 100%; }
+
+.ear-content {
+    position: relative;
+    width: 100%;
+    min-height: 150px;
+    max-height: calc(100vh - 120px);
+    padding: 30px 22px;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    box-shadow: 0 15px 45px rgba(30, 20, 70, 0.12);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    transition: transform var(--transition), opacity var(--transition), visibility var(--transition);
+}
+
+.ear-left .ear-content {
+    border-right: none;
+    border-radius: var(--radius-large) 0 0 var(--radius-large);
+    transform: translateX(100%);
+}
+
+.ear-right .ear-content {
+    border-left: none;
+    border-radius: 0 var(--radius-large) var(--radius-large) 0;
+    transform: translateX(-100%);
+}
+
+.ear.collapsed .ear-content {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.ear.expanded .ear-content {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* 按钮固定在主框两侧，不随耳朵内容移动 */
+.ear-handle {
+    top: 76px;
+    z-index: 8;
+    transition: width var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.ear-left .ear-handle { left: 100%; }
+.ear-right .ear-handle { right: 100%; }
+
+/* 紫色标题气泡真正占据卡片顶部空间，长标题自动换行并推开正文 */
+.info-card {
+    padding: 0 24px 24px;
+}
+
+.info-card .card-title-bubble {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: fit-content;
+    max-width: calc(100% - 8px);
+    min-height: 34px;
+    margin: -15px 0 18px 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.35;
+}
+
+.card-content {
+    min-width: 0;
+}
+
+/* 右侧活动画廊：随页面滚动保持在视野中，起始高度由 JS 对齐第二主框顶部 */
+.gallery-panel {
+    --gallery-width: clamp(280px, 22vw, 380px);
+    position: fixed;
+    top: var(--gallery-top, 280px);
+    right: 24px;
+    z-index: 5;
+    width: var(--gallery-width);
+    max-height: calc(100vh - var(--gallery-top, 280px) - 28px);
+    padding: 34px 16px 16px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.88);
+    border: 1px solid rgba(255,255,255,0.75);
+    border-radius: var(--radius-large);
+    box-shadow: 0 15px 45px rgba(30,20,70,0.14);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.gallery-title-bubble {
+    position: absolute;
+    top: -15px;
+    left: 22px;
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 5px 16px;
+    color: #fff;
+    font-size: .88rem;
+    font-weight: 700;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #7657e8, #9b72f3);
+    box-shadow: 0 7px 18px rgba(90,60,180,.25);
+}
+
+.gallery-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.gallery-item {
+    display: grid;
+    grid-template-columns: minmax(108px, 38%) 1fr;
+    gap: 14px;
+    min-height: 108px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-medium);
+    background: rgba(255,255,255,.58);
+}
+
+.gallery-thumb {
+    width: 100%;
+    height: 100%;
+    min-height: 88px;
+    object-fit: cover;
+    border: 0;
+    border-radius: var(--radius-small);
+    cursor: pointer;
+    background: rgba(118,87,232,.08);
+}
+
+.gallery-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 7px;
+}
+
+.gallery-name {
+    color: var(--text);
+    font-weight: 750;
+    font-size: .95rem;
+    overflow-wrap: anywhere;
+}
+
+.gallery-description {
+    color: var(--text-soft);
+    font-size: .82rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.gallery-map {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    max-width: 100%;
+    color: var(--purple);
+    font-size: .8rem;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+}
+
+.gallery-map::before { content: "⌖"; color: var(--purple); }
+
+.gallery-empty {
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--text-soft);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-medium);
+    background: rgba(255,255,255,.4);
+}
+
+@media (max-width: 1450px) {
+    .gallery-panel { display: none; }
+}
+
+@media (max-width: 900px) {
+    .gallery-panel { display: none; }
+}

@@ -68,6 +68,15 @@
                     <div id="cardsEditor" class="cards-editor"></div>
                     <button id="saveCardsButton" type="button">保存全部资料卡</button>
                 </section>
+
+                <section class="admin-panel cards-panel">
+                    <div class="panel-title-row">
+                        <div><h2>画廊 Gallery</h2><p>主页右侧最多显示 5 张图片。每项包含图片、名称、描述和地图标识。</p></div>
+                        <button id="addGalleryButton" type="button">＋ 添加图片</button>
+                    </div>
+                    <div id="galleryEditor" class="cards-editor"></div>
+                    <button id="saveGalleryButton" type="button">保存画廊</button>
+                </section>
             </main>
             <p id="adminStatus" class="status fixed-status"></p>
         </section>
@@ -98,6 +107,21 @@
                 <label>连接组 ID（普通卡可留空）<input class="card-group-input" type="text"></label>
                 <label>排序<input class="card-sort-input" type="number" min="0" step="1"></label>
             </div>
+        </article>
+    </template>
+
+    <template id="galleryTemplate">
+        <article class="editor-card gallery-editor-card">
+            <div class="card-editor-head">
+                <strong>画廊图片</strong>
+                <button class="delete-gallery" type="button">删除</button>
+            </div>
+            <label>名称<input class="gallery-name-input" type="text" placeholder="例如：The Great Pug"></label>
+            <label>描述<textarea class="gallery-description-input" rows="3" placeholder="简单介绍这张图片或这个世界"></textarea></label>
+            <label>地图 / 世界标识<input class="gallery-map-input" type="text" placeholder="例如：VRChat World"></label>
+            <label>图片 URL<input class="gallery-image-url-input" type="url"></label>
+            <label>或上传图片（最大 10 MB）<input class="gallery-image-file-input" type="file" accept="image/*"></label>
+            <label>排序<input class="gallery-sort-input" type="number" min="0" step="1"></label>
         </article>
     </template>
 

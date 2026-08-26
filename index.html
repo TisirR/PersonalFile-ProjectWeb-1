@@ -2,264 +2,67 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="description"
-        content="Personal VRChat Space"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Personal VRChat Space">
     <title>Ciallo～(∠・ω< )⌒★</title>
-
     <link rel="stylesheet" href="./css/style.css">
 </head>
-
 <body>
-
-    <!-- =====================================================
-         背景层
-    ====================================================== -->
-
     <div id="backgroundLayer"></div>
 
-
-    <!-- =====================================================
-         网站主体
-    ====================================================== -->
-
     <main class="site-shell">
-
-        <!-- =============================================
-             Profile
-        ============================================== -->
-
         <section class="profile-panel">
-
-            <!-- Avatar -->
-
             <div class="avatar-wrap">
-
-                <button
-                    id="avatarButton"
-                    class="avatar-button"
-                    type="button"
-                    aria-label="查看头像"
-                >
-
-                    <img
-                        id="avatarImage"
-                        class="avatar-image"
-                        src=""
-                        alt="Avatar"
-                    >
-
-                    <div
-                        id="avatarFallback"
-                        class="avatar-fallback"
-                    >
-                        :)
-                    </div>
-
+                <button id="avatarButton" class="avatar-button" type="button" aria-label="查看头像">
+                    <img id="avatarImage" class="avatar-image" src="" alt="Avatar">
+                    <div id="avatarFallback" class="avatar-fallback">:)</div>
                 </button>
-
             </div>
-
-
-            <!-- Name -->
-
-            <h1 id="displayName" class="display-name">
-                Loading...
-            </h1>
-
-
-            <!-- Tagline -->
-
-            <p id="tagline" class="tagline">
-                ...
-            </p>
-
-
-            <!-- About -->
-
+            <h1 id="displayName" class="display-name">Loading...</h1>
+            <p id="tagline" class="tagline">...</p>
             <div class="about-section">
-
-                <div class="section-title-bubble">
-                    About Me
-                </div>
-
-                <div
-                    id="introduction"
-                    class="about-content"
-                >
-                    Loading...
-                </div>
-
+                <div class="section-title-bubble">About Me</div>
+                <div id="introduction" class="about-content">Loading...</div>
             </div>
-
         </section>
 
-
-        <!-- =================================================
-             Information Shell
-
-             左耳 / 中间 / 右耳
-        ================================================== -->
-
-        <section
-            id="informationShell"
-            class="information-shell"
-        >
-
-            <!-- Left Ear -->
-
-            <aside
-                id="leftEar"
-                class="ear ear-left collapsed"
-            >
-
-                <button
-                    id="leftEarToggle"
-                    class="ear-handle"
-                    type="button"
-                    aria-label="展开左侧信息"
-                >
+        <section id="informationShell" class="information-shell">
+            <aside id="leftEar" class="ear ear-left collapsed">
+                <button id="leftEarToggle" class="ear-handle" type="button" aria-label="展开左侧信息" aria-expanded="false">
                     <span class="ear-arrow">❯</span>
                 </button>
-
-                <div class="ear-content">
-
-                    <div
-                        id="leftCards"
-                        class="cards-column"
-                    ></div>
-
-                </div>
-
+                <div class="ear-content"><div id="leftCards" class="cards-column"></div></div>
             </aside>
-
-
-            <!-- Center -->
 
             <div class="information-main">
-
-                <div
-                    id="centerCards"
-                    class="cards-column center-cards"
-                ></div>
-
+                <div id="centerCards" class="cards-column center-cards"></div>
             </div>
 
-
-            <!-- Right Ear -->
-
-            <aside
-                id="rightEar"
-                class="ear ear-right collapsed"
-            >
-
-                <button
-                    id="rightEarToggle"
-                    class="ear-handle"
-                    type="button"
-                    aria-label="展开右侧信息"
-                >
+            <aside id="rightEar" class="ear ear-right collapsed">
+                <button id="rightEarToggle" class="ear-handle" type="button" aria-label="展开右侧信息" aria-expanded="false">
                     <span class="ear-arrow">❮</span>
                 </button>
-
-                <div class="ear-content">
-
-                    <div
-                        id="rightCards"
-                        class="cards-column"
-                    ></div>
-
-                </div>
-
+                <div class="ear-content"><div id="rightCards" class="cards-column"></div></div>
             </aside>
-
         </section>
 
+        <aside id="galleryPanel" class="gallery-panel" aria-label="画廊">
+            <div class="gallery-title-bubble">画廊 Gallery</div>
+            <div id="galleryList" class="gallery-list"></div>
+        </aside>
 
-        <!-- =================================================
-             Visitor Count
-        ================================================== -->
-
-        <div class="visitor-box">
-
-            <span class="visitor-icon">◉</span>
-
-            <span>
-                已有
-                <strong id="visitorCount">—</strong>
-                位访客来过这里
-            </span>
-
-        </div>
-
-
-        <!-- Footer -->
-
-        <footer class="site-footer">
-
-            <span id="footerName">
-                Personal Space
-            </span>
-
-            <span class="footer-dot">
-                ·
-            </span>
-
-            <span>
-                VRChat / Personal Space
-            </span>
-
-        </footer>
-
+        <div class="visitor-box"><span class="visitor-icon">◉</span><span>已有 <strong id="visitorCount">—</strong> 位访客来过这里</span></div>
+        <footer class="site-footer"><span id="footerName">Personal Space</span><span class="footer-dot">·</span><span>VRChat / Personal Space</span></footer>
     </main>
 
-
-    <!-- =====================================================
-         图片查看器
-    ====================================================== -->
-
-    <div
-        id="imageViewer"
-        class="image-viewer"
-        hidden
-    >
-
-        <button
-            id="closeImageViewer"
-            class="image-viewer-close"
-            type="button"
-        >
-            ×
-        </button>
-
-        <img
-            id="viewerImage"
-            src=""
-            alt="Preview"
-        >
-
+    <div id="imageViewer" class="image-viewer" hidden>
+        <button id="closeImageViewer" class="image-viewer-close" type="button">×</button>
+        <img id="viewerImage" src="" alt="Preview">
     </div>
 
-
-    <!-- =====================================================
-         JavaScript
-    ====================================================== -->
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-    ></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./js/config.js"></script>
     <script src="./js/supabase.js"></script>
     <script src="./js/site.js"></script>
-
 </body>
 </html>
