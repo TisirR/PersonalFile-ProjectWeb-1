@@ -5,8 +5,7 @@
 const state = {
     profile: null,
     appearance: null,
-    cards: [],
-    gallery: []
+    cards: []
 };
 
 
@@ -71,19 +70,7 @@ const dom = {
         document.getElementById("viewerImage"),
 
     closeImageViewer:
-        document.getElementById("closeImageViewer"),
-
-    galleryPanel:
-        document.getElementById("galleryPanel"),
-   
-    galleryToggle:
-        document.getElementById("galleryToggle"),
-   
-    galleryList:
-        document.getElementById("galleryList"),
-
-    informationShell:
-        document.getElementById("informationShell")
+        document.getElementById("closeImageViewer")
 
 };
 
@@ -158,8 +145,6 @@ document.addEventListener(
 
         setupEarControls();
 
-        setupGalleryControls();
-
         setupImageViewer();
 
         await loadWebsite();
@@ -181,8 +166,7 @@ async function loadWebsite() {
         const [
             profileResult,
             appearanceResult,
-            cardsResult,
-            galleryResult
+            cardsResult
         ] = await Promise.all([
 
             supabaseClient
@@ -200,13 +184,12 @@ async function loadWebsite() {
             supabaseClient
                 .from("info_cards")
                 .select("*")
-                .order("sort_order", { ascending: true }),
-
-            supabaseClient
-                .from("gallery_items")
-                .select("*")
-                .order("sort_order", { ascending: true })
-                .limit(5)
+                .order(
+                    "sort_order",
+                    {
+                        ascending: true
+                    }
+                )
 
         ]);
 
@@ -225,20 +208,12 @@ async function loadWebsite() {
             cardsResult.data ||
             [];
 
-        state.gallery =
-            galleryResult.data ||
-            [];
-
 
         renderProfile();
 
         renderAppearance();
 
         renderCards();
-
-        renderGallery();
-
-        updateGalleryPosition();
 
     }
     catch (error) {
@@ -259,18 +234,12 @@ async function loadWebsite() {
 
         state.cards = [];
 
-        state.gallery = [];
-
 
         renderProfile();
 
         renderAppearance();
 
         renderCards();
-
-        renderGallery();
-
-        updateGalleryPosition();
 
     }
 
@@ -752,8 +721,6 @@ function setupEarControls() {
             .classList
             .add("expanded");
 
-        dom.leftEarToggle.setAttribute("aria-expanded", "true");
-
     }
 
 
@@ -765,8 +732,6 @@ function setupEarControls() {
         dom.rightEar
             .classList
             .add("expanded");
-
-        dom.rightEarToggle.setAttribute("aria-expanded", "true");
 
     }
 
@@ -828,8 +793,6 @@ function toggleEar(
             "collapsed"
         );
 
-        ear.querySelector(".ear-handle").setAttribute("aria-expanded", "false");
-
     }
     else {
 
@@ -844,8 +807,6 @@ function toggleEar(
             storageKey,
             "expanded"
         );
-
-        ear.querySelector(".ear-handle").setAttribute("aria-expanded", "true");
 
     }
 
@@ -960,228 +921,6 @@ function closeImageViewer() {
 
 }
 
-
-/* =========================================================
-   Gallery
-========================================================= */
-
-function renderGallery() {
-    if (!dom.galleryList) return;
-
-    dom.galleryList.innerHTML = "";
-
-    const items = (state.gallery || []).slice(0, 5);
-
-    if (!items.length) {
-        const empty = document.createElement("div");
-        empty.className = "gallery-empty";
-        empty.textContent = "暂无图片\n以后可以在管理后台添加。";
-        dom.galleryList.appendChild(empty);
-        return;
-    }
-
-    items.forEach(item => {
-        const article = document.createElement("article");
-        article.className = "gallery-item";
-
-        const img = document.createElement("img");
-        img.className = "gallery-thumb";
-        img.src = item.image_url || "";
-        img.alt = item.name || "Gallery image";
-        img.loading = "lazy";
-        img.addEventListener("click", () => {
-            if (!item.image_url) return;
-            dom.viewerImage.src = item.image_url;
-            dom.imageViewer.hidden = false;
-        });
-
-        const info = document.createElement("div");
-        info.className = "gallery-info";
-
-        const name = document.createElement("div");
-        name.className = "gallery-name";
-        name.textContent = item.name || "未命名图片";
-
-        const description = document.createElement("div");
-        description.className = "gallery-description";
-        description.textContent = item.description || "暂无描述";
-
-        const map = document.createElement("div");
-        map.className = "gallery-map";
-        map.textContent = item.map_name || "未标注地图";
-
-        info.append(name, description, map);
-        article.append(img, info);
-        dom.galleryList.appendChild(article);
-    });
-}
-
-/* =========================================================
-   Gallery Controls
-========================================================= */
-
-function setupGalleryControls() {
-
-    if (
-        !dom.galleryPanel ||
-        !dom.galleryToggle
-    ) {
-        return;
-    }
-
-
-    const savedState =
-        localStorage.getItem(
-            "vrc_site_gallery"
-        );
-
-
-    if (
-        savedState === "expanded"
-    ) {
-
-        dom.galleryPanel
-            .classList
-            .remove("collapsed");
-
-        dom.galleryPanel
-            .classList
-            .add("expanded");
-
-        dom.galleryToggle
-            .setAttribute(
-                "aria-expanded",
-                "true"
-            );
-
-    }
-
-
-    dom.galleryToggle
-        .addEventListener(
-            "click",
-            () => {
-
-                const expanded =
-                    dom.galleryPanel
-                        .classList
-                        .contains("expanded");
-
-
-                if (expanded) {
-
-                    dom.galleryPanel
-                        .classList
-                        .remove("expanded");
-
-                    dom.galleryPanel
-                        .classList
-                        .add("collapsed");
-
-                    dom.galleryToggle
-                        .setAttribute(
-                            "aria-expanded",
-                            "false"
-                        );
-
-                    localStorage.setItem(
-                        "vrc_site_gallery",
-                        "collapsed"
-                    );
-
-                }
-                else {
-
-                    dom.galleryPanel
-                        .classList
-                        .remove("collapsed");
-
-                    dom.galleryPanel
-                        .classList
-                        .add("expanded");
-
-                    dom.galleryToggle
-                        .setAttribute(
-                            "aria-expanded",
-                            "true"
-                        );
-
-                    localStorage.setItem(
-                        "vrc_site_gallery",
-                        "expanded"
-                    );
-
-                }
-
-            }
-        );
-
-}
-
-
-/* =========================================================
-   Gallery Position
-========================================================= */
-
-function updateGalleryPosition() {
-
-    if (
-        !dom.galleryPanel ||
-        !dom.informationShell
-    ) {
-        return;
-    }
-
-
-    const rect =
-        dom.informationShell
-            .getBoundingClientRect();
-
-
-    /*
-        限位：
-
-        初始位置 = 第二主框顶部
-
-        向下滚动后：
-        画廊跟着上移
-
-        最高不会超过视口顶部 24px
-    */
-
-    const safeTop = 24;
-
-
-    const top =
-        Math.max(
-            safeTop,
-            rect.top
-        );
-
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--gallery-top",
-            `${top}px`
-        );
-
-}
-
-
-window.addEventListener(
-    "scroll",
-    updateGalleryPosition,
-    {
-        passive: true
-    }
-);
-
-
-window.addEventListener(
-    "resize",
-    updateGalleryPosition
-);
 
 /* =========================================================
    Visitor Counter
