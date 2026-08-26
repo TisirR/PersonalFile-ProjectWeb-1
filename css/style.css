@@ -283,26 +283,63 @@ button { font: inherit; }
     z-index:10;
     width:var(--gallery-width);
     overflow:visible;
+
+    /*
+       关键：
+       Gallery 自己负责移动。
+       按钮是 Gallery 的子元素，
+       所以会和 Gallery 一起移动。
+    */
+    transition:transform .45s cubic-bezier(.22,.8,.25,1);
 }
+
 .gallery-content {
     width:100%;
     max-height:calc(100vh - var(--gallery-top,24px) - 24px);
     padding:0 16px 16px;
     overflow-y:auto;
+
     background:rgba(255,255,255,.88);
     border:1px solid rgba(255,255,255,.75);
     border-radius:var(--radius-large);
+
     box-shadow:0 15px 45px rgba(30,20,70,.14);
+
     backdrop-filter:blur(18px);
     -webkit-backdrop-filter:blur(18px);
-    transition:transform .45s cubic-bezier(.22,.8,.25,1),opacity .25s ease;
+
+    transition:opacity .25s ease;
 }
+
+/*
+   收起：
+   整个 Gallery 向右移动。
+
+   Gallery 内容离开屏幕，
+   但左侧的按钮仍然露在屏幕内。
+*/
+.gallery-panel.collapsed {
+    transform:translateX(100%);
+}
+
 .gallery-panel.collapsed .gallery-content {
-    transform:translateX(calc(100% + 24px));
     opacity:0;
     pointer-events:none;
 }
-.gallery-panel.expanded .gallery-content { transform:translateX(0); opacity:1; pointer-events:auto; }
+
+/*
+   展开：
+   整个 Gallery 从右侧向左弹出。
+   按钮和 Gallery 一起回来。
+*/
+.gallery-panel.expanded {
+    transform:translateX(0);
+}
+
+.gallery-panel.expanded .gallery-content {
+    opacity:1;
+    pointer-events:auto;
+}
 .gallery-handle {
     position:absolute;
     top:0;
@@ -317,7 +354,7 @@ button { font: inherit; }
     cursor:pointer;
     color:#fff;
     border:1px solid rgba(255,255,255,.28);
-    border-radius:var(--radius-medium) 0 0 var(--radius-medium);
+    border-radius:var(--radius-medium);
     background:linear-gradient(180deg,#7657e8,#9b72f3);
     box-shadow:0 8px 20px rgba(80,55,170,.32);
     transition:transform var(--transition),box-shadow var(--transition);
