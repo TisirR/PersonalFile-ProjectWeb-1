@@ -76,6 +76,9 @@ const dom = {
     galleryPanel:
         document.getElementById("galleryPanel"),
 
+    galleryToggle:
+        document.getElementById("galleryToggle"),
+   
     galleryList:
         document.getElementById("galleryList"),
 
@@ -154,7 +157,9 @@ document.addEventListener(
     async () => {
 
         setupEarControls();
-
+      
+        setupGalleryControls();
+      
         setupImageViewer();
 
         await loadWebsite();
@@ -1011,19 +1016,178 @@ function renderGallery() {
     });
 }
 
-/*
-   画廊顶部以第二主框顶部为参考，只在布局变化时重新计算。
-   画廊自身是 fixed，因此用户向下滚动时保持当前位置。
-*/
-function updateGalleryPosition() {
-    if (!dom.galleryPanel || !dom.informationShell) return;
+/* =========================================================
+   Gallery Controls + Position
+========================================================= */
 
-    const rect = dom.informationShell.getBoundingClientRect();
-    const top = Math.max(18, rect.top);
-    document.documentElement.style.setProperty("--gallery-top", `${top}px`);
+function setupGalleryControls() {
+
+    if (
+        !dom.galleryPanel ||
+        !dom.galleryToggle
+    ) {
+        return;
+    }
+
+    const savedState =
+        localStorage.getItem(
+            "vrc_site_gallery"
+        );
+
+    if (
+        savedState === "expanded"
+    ) {
+
+        dom.galleryPanel
+            .classList
+            .remove("collapsed");
+
+        dom.galleryPanel
+            .classList
+            .add("expanded");
+
+        dom.galleryToggle
+            .setAttribute(
+                "aria-expanded",
+                "true"
+            );
+
+    }
+
+
+    dom.galleryToggle
+        .addEventListener(
+            "click",
+            () => {
+
+                const expanded =
+                    dom.galleryPanel
+                        .classList
+                        .contains(
+                            "expanded"
+                        );
+
+
+                if (expanded) {
+
+                    dom.galleryPanel
+                        .classList
+                        .remove(
+                            "expanded"
+                        );
+
+                    dom.galleryPanel
+                        .classList
+                        .add(
+                            "collapsed"
+                        );
+
+                    dom.galleryToggle
+                        .setAttribute(
+                            "aria-expanded",
+                            "false"
+                        );
+
+                    localStorage.setItem(
+                        "vrc_site_gallery",
+                        "collapsed"
+                    );
+
+                }
+                else {
+
+                    dom.galleryPanel
+                        .classList
+                        .remove(
+                            "collapsed"
+                        );
+
+                    dom.galleryPanel
+                        .classList
+                        .add(
+                            "expanded"
+                        );
+
+                    dom.galleryToggle
+                        .setAttribute(
+                            "aria-expanded",
+                            "true"
+                        );
+
+                    localStorage.setItem(
+                        "vrc_site_gallery",
+                        "expanded"
+                    );
+
+                }
+
+            }
+        );
+
 }
 
-window.addEventListener("resize", updateGalleryPosition);
+
+/*
+   画廊初始位置：
+   第二主框顶部。
+
+   用户向下滚动时：
+   第二主框顶部逐渐离开屏幕，
+   画廊跟着向上移动。
+
+   到达浏览器顶部安全距离后：
+   不再继续上移。
+
+   这样就是你说的：
+   "下面自动上滑，但始终留在用户界面内"
+*/
+function updateGalleryPosition() {
+
+    if (
+        !dom.galleryPanel ||
+        !dom.informationShell
+    ) {
+        return;
+    }
+
+
+    const rect =
+        dom.informationShell
+            .getBoundingClientRect();
+
+
+    const safeTop = 24;
+
+    const galleryTop =
+        Math.max(
+            safeTop,
+            rect.top
+        );
+
+
+    document.documentElement
+        .style
+        .setProperty(
+            "--gallery-top",
+            `${galleryTop}px`
+        );
+
+}
+
+
+window.addEventListener(
+    "scroll",
+    updateGalleryPosition,
+    {
+        passive: true
+    }
+);
+
+
+window.addEventListener(
+    "resize",
+    updateGalleryPosition
+);
 
 /* =========================================================
    Visitor Counter
