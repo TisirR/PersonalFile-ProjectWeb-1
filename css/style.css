@@ -1105,15 +1105,14 @@ body {
 }
 
 /* =========================================================
-   Ear + Gallery Revision
-   最终定位逻辑
+   Ear + Gallery Revision v2
 ========================================================= */
 
 :root {
 
     /*
-        主框之间原本的间隔是 28px。
-        耳朵与第二主框之间也使用同样的距离。
+        主框之间原本的垂直间隔。
+        耳朵和中间主框也使用相同的视觉距离。
     */
     --panel-gap: 28px;
 
@@ -1121,8 +1120,18 @@ body {
 
 
 /* =========================================================
-   左右耳朵
+   耳朵整体
 ========================================================= */
+
+/*
+    注意：
+
+    ear 本身永远停在主框外侧。
+
+    它只是一个“展开轨道”。
+
+    左右耳朵都不会穿过中间主框。
+*/
 
 .ear {
 
@@ -1130,27 +1139,26 @@ body {
 
     top: 0;
 
-    z-index: 8;
+    z-index: 20;
 
     width: var(--ear-width);
 
-    min-height: 150px;
-
-    height: auto;
-
     overflow: visible;
 
-    transform: none !important;
+    pointer-events: none;
 
 }
 
 
-/*
-    左耳：
+/* =========================================================
+   左耳位置
+========================================================= */
 
-    [ 左耳 ]   28px空隙   [ 主框 ]
-*/
 .ear-left {
+
+    /*
+        主框 ← 28px → 耳朵起点
+    */
 
     right:
         calc(
@@ -1161,12 +1169,15 @@ body {
 }
 
 
-/*
-    右耳：
+/* =========================================================
+   右耳位置
+========================================================= */
 
-    [ 主框 ]   28px空隙   [ 右耳 ]
-*/
 .ear-right {
+
+    /*
+        主框 ← 28px → 耳朵起点
+    */
 
     left:
         calc(
@@ -1178,7 +1189,7 @@ body {
 
 
 /* =========================================================
-   耳朵内容本体
+   耳朵主体
 ========================================================= */
 
 .ear-content {
@@ -1192,14 +1203,16 @@ body {
     max-height:
         calc(
             100vh -
-            100px
+            80px
         );
 
     padding:
-        30px
+        24px
         22px;
 
     overflow-y: auto;
+
+    pointer-events: auto;
 
     background:
         rgba(
@@ -1219,8 +1232,9 @@ body {
         );
 
     /*
-        改成和主框一样的圆角方框
+        全圆角
     */
+
     border-radius:
         var(--radius-large);
 
@@ -1242,27 +1256,40 @@ body {
     transition:
 
         transform
-        var(--transition),
+        0.42s
+        cubic-bezier(
+            .22,
+            .8,
+            .25,
+            1
+        ),
 
         opacity
-        var(--transition),
+        0.30s ease,
 
         visibility
-        var(--transition);
+        0.30s ease;
 
 }
 
 
 /* =========================================================
    左耳动画
+
+   展开方向：
+
+   主框 ← 空隙 ← 按钮 ← 耳朵
+
+   耳朵向左生长
 ========================================================= */
+
 
 /*
     收起：
 
-    左耳向左退回去。
-    完全不会经过中间主框。
+    整个耳朵向左缩回。
 */
+
 .ear-left.collapsed
 .ear-content {
 
@@ -1270,7 +1297,7 @@ body {
         translateX(
             calc(
                 -100% -
-                12px
+                20px
             )
         );
 
@@ -1286,8 +1313,9 @@ body {
 /*
     展开：
 
-    从左侧弹出。
+    耳朵回到自己的正常位置。
 */
+
 .ear-left.expanded
 .ear-content {
 
@@ -1298,20 +1326,17 @@ body {
 
     visibility: visible;
 
-    pointer-events: auto;
-
 }
 
 
 /* =========================================================
    右耳动画
+
+   主框 → 空隙 → 按钮 → 耳朵
+
+   耳朵向右生长
 ========================================================= */
 
-/*
-    收起：
-
-    向右侧退回。
-*/
 .ear-right.collapsed
 .ear-content {
 
@@ -1319,7 +1344,7 @@ body {
         translateX(
             calc(
                 100% +
-                12px
+                20px
             )
         );
 
@@ -1332,9 +1357,6 @@ body {
 }
 
 
-/*
-    展开
-*/
 .ear-right.expanded
 .ear-content {
 
@@ -1345,38 +1367,41 @@ body {
 
     visibility: visible;
 
-    pointer-events: auto;
-
 }
 
 
 /* =========================================================
-   耳朵把手
+   耳朵按钮
+
+   按钮属于 ear 容器。
+
+   所以不会再出现：
+   耳朵在左边
+   按钮却跑到中间
+
 ========================================================= */
 
 .ear-handle {
 
     position: absolute;
 
-    top: 76px;
+    top: 50%;
 
-    z-index: 20;
+    z-index: 30;
 
-    width:
-        var(--ear-handle-width);
+    width: 42px;
 
-    height: 76px;
+    height: 68px;
 
     padding: 0;
 
-    border:
-        1px solid
-        rgba(
-            255,
-            255,
-            255,
-            0.28
-        );
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    pointer-events: auto;
 
     cursor: pointer;
 
@@ -1389,95 +1414,125 @@ body {
             #9b72f3
         );
 
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.28
+        );
+
+    /*
+        全圆角
+    */
+
+    border-radius:
+        999px;
+
     box-shadow:
         0 8px 20px
         rgba(
             80,
             55,
             170,
-            0.30
+            0.32
         );
+
+    transform:
+        translateY(-50%);
 
     transition:
 
-        width
-        var(--transition),
-
         transform
-        var(--transition),
+        0.42s
+        cubic-bezier(
+            .22,
+            .8,
+            .25,
+            1
+        ),
 
         box-shadow
-        var(--transition);
+        0.25s ease;
 
 }
 
 
-/*
-    左耳按钮：
+/* =========================================================
+   左耳按钮
+========================================================= */
 
-    跟着左耳，
-    位于左耳右边缘。
+/*
+    按钮放在耳朵靠近主框的一侧。
 */
+
 .ear-left
 .ear-handle {
 
-    left: 100%;
+    left:
+        calc(
+            100% +
+            10px
+        );
 
-    border-radius:
-        0
-        14px
-        14px
-        0;
+}
+
+
+/* =========================================================
+   右耳按钮
+========================================================= */
+
+.ear-right
+.ear-handle {
+
+    right:
+        calc(
+            100% +
+            10px
+        );
 
 }
 
 
 /*
-    右耳按钮：
-
-    跟着右耳，
-    位于右耳左边缘。
+    悬停
 */
-.ear-right
-.ear-handle {
-
-    right: 100%;
-
-    border-radius:
-        14px
-        0
-        0
-        14px;
-
-}
-
 
 .ear-handle:hover {
 
-    width: 42px;
-
     box-shadow:
-        0 12px 26px
+        0 12px 28px
         rgba(
             80,
             55,
             170,
-            0.42
+            0.48
         );
 
 }
 
+
+/* =========================================================
+   箭头
+========================================================= */
 
 .ear-arrow {
 
     display: block;
 
+    font-size: 1.05rem;
+
     transition:
         transform
-        var(--transition);
+        0.35s ease;
 
 }
 
+
+/*
+    展开以后箭头翻转
+*/
 
 .ear-left.expanded
 .ear-arrow {
@@ -1498,8 +1553,12 @@ body {
 
 
 /* =========================================================
-   紫色标题气泡
-   标题必须占据真实布局空间
+   信息卡标题
+
+   修复：
+   紫色气泡必须占据真实高度。
+
+   不再 absolute。
 ========================================================= */
 
 .info-card {
@@ -1523,6 +1582,8 @@ body {
 
     display: inline-flex;
 
+    align-items: center;
+
     width: fit-content;
 
     max-width:
@@ -1543,7 +1604,7 @@ body {
 
     overflow-wrap: anywhere;
 
-    line-height: 1.35;
+    line-height: 1.4;
 
 }
 
@@ -1554,15 +1615,11 @@ body {
 
 .gallery-panel {
 
-    /*
-        宽度保持在右侧空白区域，
-        不侵入右耳区域。
-    */
     --gallery-width:
         clamp(
-            250px,
+            260px,
             17vw,
-            320px
+            330px
         );
 
     position: fixed;
@@ -1575,7 +1632,7 @@ body {
 
     right: 24px;
 
-    z-index: 12;
+    z-index: 25;
 
     width:
         var(--gallery-width);
@@ -1585,9 +1642,10 @@ body {
 }
 
 
-/*
-    画廊真正的内容框
-*/
+/* =========================================================
+   Gallery 主体
+========================================================= */
+
 .gallery-content {
 
     position: relative;
@@ -1605,7 +1663,7 @@ body {
         );
 
     padding:
-        34px
+        18px
         16px
         16px;
 
@@ -1649,23 +1707,27 @@ body {
     transition:
 
         transform
-        var(--transition),
+        0.42s
+        cubic-bezier(
+            .22,
+            .8,
+            .25,
+            1
+        ),
 
         opacity
-        var(--transition),
+        0.30s ease,
 
         visibility
-        var(--transition);
+        0.30s ease;
 
 }
 
 
-/*
-    画廊收起：
+/* =========================================================
+   Gallery 收起 / 展开
+========================================================= */
 
-    内容往右侧退回，
-    只留下把手。
-*/
 .gallery-panel.collapsed
 .gallery-content {
 
@@ -1673,7 +1735,7 @@ body {
         translateX(
             calc(
                 100% +
-                12px
+                20px
             )
         );
 
@@ -1696,46 +1758,40 @@ body {
 
     visibility: visible;
 
-    pointer-events: auto;
-
 }
 
 
 /* =========================================================
    Gallery Handle
+
+   同样改成全圆角。
 ========================================================= */
 
 .gallery-handle {
 
     position: absolute;
 
-    top: 76px;
+    top: 50%;
 
-    right: 100%;
+    right:
+        calc(
+            100% +
+            10px
+        );
 
-    z-index: 20;
+    z-index: 30;
 
-    width:
-        var(--ear-handle-width);
+    width: 42px;
 
-    height: 76px;
+    height: 68px;
 
     padding: 0;
 
-    border:
-        1px solid
-        rgba(
-            255,
-            255,
-            255,
-            0.28
-        );
+    display: flex;
 
-    border-radius:
-        14px
-        0
-        0
-        14px;
+    align-items: center;
+
+    justify-content: center;
 
     cursor: pointer;
 
@@ -1748,37 +1804,47 @@ body {
             #9b72f3
         );
 
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.28
+        );
+
+    border-radius:
+        999px;
+
     box-shadow:
         0 8px 20px
         rgba(
             80,
             55,
             170,
-            0.30
+            0.32
         );
+
+    transform:
+        translateY(-50%);
 
     transition:
 
-        width
-        var(--transition),
-
         box-shadow
-        var(--transition);
+        0.25s ease;
 
 }
 
 
 .gallery-handle:hover {
 
-    width: 42px;
-
     box-shadow:
-        0 12px 26px
+        0 12px 28px
         rgba(
             80,
             55,
             170,
-            0.42
+            0.48
         );
 
 }
@@ -1788,9 +1854,11 @@ body {
 
     display: block;
 
+    font-size: 1.05rem;
+
     transition:
         transform
-        var(--transition);
+        0.35s ease;
 
 }
 
@@ -1805,22 +1873,35 @@ body {
 
 
 /* =========================================================
-   Gallery Title
+   Gallery 标题
+
+   重点修复：
+
+   不再 absolute。
+
+   让标题气泡占据真实高度，
+   所以第一张图片不会再压住它。
 ========================================================= */
 
 .gallery-title-bubble {
 
-    position: absolute;
-
-    top: -15px;
-
-    left: 22px;
+    position: relative;
 
     display: inline-flex;
 
     align-items: center;
 
     min-height: 34px;
+
+    width: fit-content;
+
+    max-width: 100%;
+
+    margin:
+        -34px
+        0
+        16px
+        8px;
 
     padding:
         5px
@@ -1831,6 +1912,8 @@ body {
     font-size: 0.88rem;
 
     font-weight: 700;
+
+    line-height: 1.35;
 
     border-radius: 999px;
 
@@ -1849,6 +1932,17 @@ body {
             180,
             0.25
         );
+
+}
+
+
+/*
+    给 gallery 顶部真正留出空间。
+*/
+
+.gallery-content {
+
+    padding-top: 34px;
 
 }
 
@@ -2002,9 +2096,6 @@ body {
 
     content: "⌖";
 
-    color:
-        var(--purple);
-
 }
 
 
@@ -2012,7 +2103,9 @@ body {
    Responsive
 ========================================================= */
 
-@media (max-width: 1450px) {
+@media (
+    max-width: 1450px
+) {
 
     .gallery-panel {
 
@@ -2023,7 +2116,9 @@ body {
 }
 
 
-@media (max-width: 900px) {
+@media (
+    max-width: 900px
+) {
 
     .ear {
 
