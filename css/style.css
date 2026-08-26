@@ -1,1105 +1,418 @@
 /* =========================================================
-   Root
+   Personal VRC Space — Stable Layout
+   One source of truth for desktop ears, gallery and responsive flow.
 ========================================================= */
 
 :root {
     --bg-1: #667eea;
     --bg-2: #764ba2;
-
-    /*
-        上方 Profile
-        与下方中间主体共用的宽度
-    */
     --main-content-width: 760px;
-
-    /*
-        左右耳朵展开宽度
-    */
     --ear-width: 260px;
+    --handle-width: 38px;
+    --handle-height: 68px;
+    --side-gap: 10px;
+    --gallery-width: clamp(280px, 20vw, 360px);
 
-    /*
-        收起状态露出的耳朵宽度
-    */
-    --ear-handle-width: 34px;
-
-    --panel: rgba(255, 255, 255, 0.92);
-    --panel-strong: rgba(255, 255, 255, 0.97);
-
+    --panel: rgba(255,255,255,.92);
+    --panel-strong: rgba(255,255,255,.97);
     --text: #2c2c34;
     --text-soft: #6d6d78;
-
     --purple: #7657e8;
     --purple-soft: #a685ff;
-
-    --border: rgba(110, 80, 190, 0.16);
-
-    --shadow:
-        0 20px 60px rgba(30, 20, 70, 0.16);
-
+    --border: rgba(110,80,190,.16);
+    --shadow: 0 20px 60px rgba(30,20,70,.16);
     --radius-large: 28px;
     --radius-medium: 20px;
     --radius-small: 14px;
-
-    --transition:
-        0.38s cubic-bezier(.2, .8, .2, 1);
+    --transition: .38s cubic-bezier(.2,.8,.2,1);
 }
 
-
-/* =========================================================
-   Reset
-========================================================= */
-
-* {
-    box-sizing: border-box;
-}
-
-
-html {
-    min-height: 100%;
-}
-
-
+* { box-sizing: border-box; }
+html { min-height: 100%; }
 body {
     margin: 0;
-
     min-width: 320px;
     min-height: 100vh;
-
-    color: var(--text);
-
-    font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        "Microsoft YaHei",
-        sans-serif;
-
     overflow-x: hidden;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--bg-1),
-            var(--bg-2)
-        );
+    color: var(--text);
+    font-family: Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+    background: linear-gradient(135deg,var(--bg-1),var(--bg-2));
 }
+button { font: inherit; }
 
-
-/* =========================================================
-   Background
-========================================================= */
-
+/* Background */
 #backgroundLayer {
     position: fixed;
-
     inset: 0;
-
     z-index: -2;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--bg-1),
-            var(--bg-2)
-        );
-
+    background: linear-gradient(135deg,var(--bg-1),var(--bg-2));
     background-size: cover;
     background-position: center;
-
     transform: scale(1.03);
-
-    transition:
-        background var(--transition),
-        filter var(--transition);
+    transition: background var(--transition),filter var(--transition);
 }
-
-
 #backgroundLayer::after {
     content: "";
-
     position: absolute;
-
     inset: 0;
-
     pointer-events: none;
-
     background:
-        radial-gradient(
-            circle at 20% 20%,
-            rgba(255, 255, 255, 0.18),
-            transparent 45%
-        ),
-
-        radial-gradient(
-            circle at 80% 70%,
-            rgba(255, 255, 255, 0.12),
-            transparent 45%
-        );
+        radial-gradient(circle at 20% 20%,rgba(255,255,255,.18),transparent 45%),
+        radial-gradient(circle at 80% 70%,rgba(255,255,255,.12),transparent 45%);
 }
 
-
-/* =========================================================
-   Site Shell
-========================================================= */
-
+/* Global shell */
 .site-shell {
     width: 100%;
-
     margin: 0 auto;
-
-    padding:
-        56px 16px
-        40px;
-
+    padding: 56px 16px 40px;
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     gap: 28px;
 }
 
+/* Shared panel */
+.profile-panel,
+.information-main {
+    background: var(--panel);
+    border: 1px solid rgba(255,255,255,.8);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
 
-/* =========================================================
-   Profile Panel
-
-   宽度 = 中间主体
-========================================================= */
-
+/* Profile */
 .profile-panel {
-    width:
-        min(
-            var(--main-content-width),
-            100%
-        );
-
-    padding:
-        38px
-        42px
-        42px;
-
+    width: min(var(--main-content-width),100%);
+    padding: 38px 42px 42px;
     text-align: center;
-
-    background:
-        var(--panel);
-
-    border:
-        1px solid
-        rgba(255, 255, 255, 0.8);
-
-    border-radius:
-        var(--radius-large);
-
-    box-shadow:
-        var(--shadow);
-
-    backdrop-filter:
-        blur(18px);
-
-    -webkit-backdrop-filter:
-        blur(18px);
+    border-radius: var(--radius-large);
 }
-
-
-/* =========================================================
-   Avatar
-========================================================= */
-
-.avatar-wrap {
-    display: flex;
-
-    justify-content: center;
-
-    margin-bottom: 16px;
-}
-
-
+.avatar-wrap { display:flex; justify-content:center; margin-bottom:16px; }
 .avatar-button {
     position: relative;
-
     width: 132px;
     height: 132px;
-
     padding: 5px;
-
-    border: none;
-
+    border: 0;
     border-radius: 50%;
-
     cursor: pointer;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--purple),
-            var(--purple-soft)
-        );
-
-    box-shadow:
-        0 10px 28px
-        rgba(100, 70, 200, 0.32);
-
-    transition:
-        transform var(--transition),
-        box-shadow var(--transition);
+    background: linear-gradient(135deg,var(--purple),var(--purple-soft));
+    box-shadow: 0 10px 28px rgba(100,70,200,.32);
+    transition: transform var(--transition),box-shadow var(--transition);
 }
-
-
-.avatar-button:hover {
-    transform:
-        translateY(-4px)
-        scale(1.02);
-
-    box-shadow:
-        0 18px 38px
-        rgba(100, 70, 200, 0.42);
-}
-
-
-.avatar-image,
-.avatar-fallback {
-    width: 100%;
-    height: 100%;
-
-    border-radius: 50%;
-}
-
-
-.avatar-image {
-    display: none;
-
-    object-fit: cover;
-
-    background: white;
-}
-
-
-.avatar-image.is-visible {
-    display: block;
-}
-
-
-.avatar-fallback {
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    color: white;
-
-    font-size: 2.2rem;
-
-    font-weight: 700;
-
-    background:
-        linear-gradient(
-            135deg,
-            #667eea,
-            #764ba2
-        );
-}
-
-
-/* =========================================================
-   Profile Text
-========================================================= */
-
-.display-name {
-    margin:
-        0 0 8px;
-
-    font-size:
-        clamp(2rem, 6vw, 3.2rem);
-
-    line-height: 1.1;
-
-    font-weight: 750;
-
-    letter-spacing: -0.04em;
-}
-
-
-.tagline {
-    margin:
-        0 auto 30px;
-
-    max-width: 560px;
-
-    color:
-        var(--purple);
-
-    font-size:
-        1rem;
-
-    line-height: 1.7;
-}
-
-
-/* =========================================================
-   About
-========================================================= */
-
+.avatar-button:hover { transform:translateY(-4px) scale(1.02); box-shadow:0 18px 38px rgba(100,70,200,.42); }
+.avatar-image,.avatar-fallback { width:100%; height:100%; border-radius:50%; }
+.avatar-image { display:none; object-fit:cover; background:#fff; }
+.avatar-image.is-visible { display:block; }
+.avatar-fallback { display:flex; align-items:center; justify-content:center; color:#fff; font-size:2.2rem; font-weight:700; background:linear-gradient(135deg,#667eea,#764ba2); }
+.display-name { margin:0 0 8px; font-size:clamp(2rem,6vw,3.2rem); line-height:1.1; font-weight:750; letter-spacing:-.04em; }
+.tagline { margin:0 auto 30px; max-width:560px; color:var(--purple); font-size:1rem; line-height:1.7; }
 .about-section {
-    position: relative;
-
-    margin-top: 18px;
-
-    padding:
-        38px 30px
-        28px;
-
-    text-align: left;
-
-    background:
-        rgba(255, 255, 255, 0.62);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius:
-        var(--radius-medium);
+    position:relative;
+    margin-top:18px;
+    padding:38px 30px 28px;
+    text-align:left;
+    background:rgba(255,255,255,.62);
+    border:1px solid var(--border);
+    border-radius:var(--radius-medium);
 }
-
-
-.section-title-bubble,
-.card-title-bubble {
-    position: absolute;
-
-    top: -15px;
-    left: 24px;
-
-    display: inline-flex;
-
-    align-items: center;
-
-    min-height: 34px;
-
-    padding:
-        5px 16px;
-
-    color: white;
-
-    font-size: 0.88rem;
-
-    font-weight: 700;
-
-    border-radius: 999px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #7657e8,
-            #9b72f3
-        );
-
-    box-shadow:
-        0 7px 18px
-        rgba(90, 60, 180, 0.25);
+.section-title-bubble {
+    position:absolute;
+    top:-15px;
+    left:24px;
+    display:inline-flex;
+    align-items:center;
+    min-height:34px;
+    padding:5px 16px;
+    color:#fff;
+    font-size:.88rem;
+    font-weight:700;
+    border-radius:999px;
+    background:linear-gradient(135deg,#7657e8,#9b72f3);
+    box-shadow:0 7px 18px rgba(90,60,180,.25);
 }
-
-
-.about-content {
-    color:
-        var(--text-soft);
-
-    white-space: pre-wrap;
-
-    line-height: 1.9;
-
-    font-size: 0.98rem;
-}
-
+.about-content { color:var(--text-soft); white-space:pre-wrap; line-height:1.9; font-size:.98rem; }
 
 /* =========================================================
-   Information Shell
-
-   这是整个耳朵系统的核心。
-
-   外层不再是 Flex 三栏，
-   而是一个固定中间主体，
-   左右耳朵绝对定位到主体背后。
-
-   所以：
-   耳朵展开不会压缩中间主体。
+   Information shell
+   Main panel is the anchor. Ears never participate in width calculation.
 ========================================================= */
-
 .information-shell {
-    position: relative;
-
-    width:
-        min(
-            var(--main-content-width),
-            100%
-        );
-
-    isolation: isolate;
+    position:relative;
+    width:min(var(--main-content-width),100%);
+    isolation:isolate;
 }
-
-
-/* =========================================================
-   Main Information Panel
-========================================================= */
-
 .information-main {
-    position: relative;
-
-    z-index: 3;
-
-    width: 100%;
-
-    min-height: 240px;
-
-    padding: 30px;
-
-    background:
-        var(--panel);
-
-    border:
-        1px solid
-        rgba(255, 255, 255, 0.8);
-
-    border-radius:
-        var(--radius-large);
-
-    box-shadow:
-        var(--shadow);
-
-    backdrop-filter:
-        blur(18px);
-
-    -webkit-backdrop-filter:
-        blur(18px);
+    position:relative;
+    z-index:3;
+    width:100%;
+    min-height:240px;
+    padding:30px;
+    border-radius:var(--radius-large);
 }
-
-
-/* =========================================================
-   Cards
-========================================================= */
-
-.cards-column {
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 20px;
-}
-
-
+.cards-column { display:flex; flex-direction:column; gap:20px; }
 .info-card {
-    position: relative;
-
-    padding:
-        34px 24px
-        24px;
-
-    background:
-        rgba(255, 255, 255, 0.72);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius:
-        var(--radius-medium);
-
-    overflow: visible;
-
-    transition:
-        transform var(--transition),
-        box-shadow var(--transition);
+    position:relative;
+    padding:0 24px 24px;
+    background:rgba(255,255,255,.72);
+    border:1px solid var(--border);
+    border-radius:var(--radius-medium);
+    overflow:visible;
+    transition:transform var(--transition),box-shadow var(--transition);
 }
-
-
-.info-card:hover {
-    transform:
-        translateY(-3px);
-
-    box-shadow:
-        0 12px 28px
-        rgba(50, 30, 110, 0.12);
-}
-
-
+.info-card:hover { transform:translateY(-3px); box-shadow:0 12px 28px rgba(50,30,110,.12); }
 .info-card .card-title-bubble {
-    top: -15px;
-
-    left: 18px;
+    position:relative;
+    top:auto;
+    left:auto;
+    display:inline-flex;
+    align-items:center;
+    width:fit-content;
+    max-width:calc(100% - 8px);
+    min-height:34px;
+    margin:-15px 0 18px;
+    padding:5px 16px;
+    color:#fff;
+    font-size:.88rem;
+    font-weight:700;
+    line-height:1.4;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    border-radius:999px;
+    background:linear-gradient(135deg,#7657e8,#9b72f3);
+    box-shadow:0 7px 18px rgba(90,60,180,.25);
 }
-
-
-.card-content {
-    color:
-        var(--text-soft);
-
-    white-space: pre-wrap;
-
-    line-height: 1.8;
-
-    font-size: 0.95rem;
-}
-
+.card-content { color:var(--text-soft); white-space:pre-wrap; line-height:1.8; font-size:.95rem; }
+.card-group { overflow:visible; border-radius:var(--radius-medium); }
+.card-group .info-card { border-radius:0; margin:0; border-bottom:0; }
+.card-group .info-card:first-child { border-radius:var(--radius-medium) var(--radius-medium) 0 0; }
+.card-group .info-card:last-child { border-radius:0 0 var(--radius-medium) var(--radius-medium); border-bottom:1px solid var(--border); }
 
 /* =========================================================
-   Connected Cards
+   Desktop ears
+   Expanded: handle → ear → main (left), main → ear → handle (right)
+   Collapsed: content is fully behind main; only handle remains.
 ========================================================= */
-
-.card-group {
-    overflow: visible;
-
-    border-radius:
-        var(--radius-medium);
-}
-
-
-.card-group .info-card {
-    border-radius: 0;
-
-    margin: 0;
-
-    border-bottom: none;
-}
-
-
-.card-group .info-card:first-child {
-    border-radius:
-        var(--radius-medium)
-        var(--radius-medium)
-        0
-        0;
-}
-
-
-.card-group .info-card:last-child {
-    border-radius:
-        0
-        0
-        var(--radius-medium)
-        var(--radius-medium);
-
-    border-bottom:
-        1px solid
-        var(--border);
-}
-
-
-/* =========================================================
-   Ears Base
-
-   默认状态：
-   耳朵藏在主体后面，只露出展开按钮。
-
-   关键：
-   耳朵不再使用 top + bottom 绑定高度。
-   高度完全由自己的内容决定，内容多了才向上下延长。
-========================================================= */
-
 .ear {
-    position: absolute;
-
-    top: 50%;
-    bottom: auto;
-
-    z-index: 4;
-
-    width:
-        var(--ear-width);
-
-    min-height: 150px;
-
-    height: auto;
-
-    overflow: visible;
-
-    transition:
-        transform var(--transition);
+    position:absolute;
+    top:0;
+    z-index:2;
+    width:var(--ear-width);
+    pointer-events:none;
+    transition:transform var(--transition);
 }
-
-
-/* =========================================================
-   Ear Content
-========================================================= */
-
 .ear-content {
-    width: 100%;
-
-    min-height: 150px;
-
-    max-height:
-        calc(100vh - 120px);
-
-    padding:
-        30px 22px;
-
-    overflow-y: auto;
-
-    background:
-        rgba(255, 255, 255, 0.88);
-
-    border:
-        1px solid
-        rgba(255, 255, 255, 0.75);
-
-    box-shadow:
-        0 15px 45px
-        rgba(30, 20, 70, 0.12);
-
-    backdrop-filter:
-        blur(18px);
-
-    -webkit-backdrop-filter:
-        blur(18px);
+    width:100%;
+    min-height:150px;
+    max-height:calc(100vh - 48px);
+    padding:30px 22px;
+    overflow-y:auto;
+    pointer-events:auto;
+    background:rgba(255,255,255,.88);
+    border:1px solid rgba(255,255,255,.75);
+    box-shadow:0 15px 45px rgba(30,20,70,.14);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
 }
-
-
-/* =========================================================
-   Left Ear
-========================================================= */
-
 .ear-left {
-    right: 100%;
-
-    border-radius:
-        var(--radius-large)
-        0
-        0
-        var(--radius-large);
-
-    transform:
-        translate(
-            calc(
-                100% -
-                var(--ear-handle-width)
-            ),
-            -50%
-        );
+    right:100%;
+    transform:translateX(var(--ear-width));
 }
-
-
-.ear-left .ear-content {
-    border-right: none;
-
-    border-radius:
-        var(--radius-large)
-        0
-        0
-        var(--radius-large);
-}
-
-
-.ear-left.expanded {
-    transform:
-        translate(
-            0,
-            -50%
-        );
-}
-
-
-/* =========================================================
-   Right Ear
-========================================================= */
-
+.ear-left.expanded { transform:translateX(0); }
+.ear-left .ear-content { border-radius:var(--radius-large) 0 0 var(--radius-large); }
 .ear-right {
-    left: 100%;
-
-    border-radius:
-        0
-        var(--radius-large)
-        var(--radius-large)
-        0;
-
-    transform:
-        translate(
-            calc(
-                -100% +
-                var(--ear-handle-width)
-            ),
-            -50%
-        );
+    left:100%;
+    transform:translateX(calc(-1 * var(--ear-width)));
 }
-
-
-.ear-right .ear-content {
-    border-left: none;
-
-    border-radius:
-        0
-        var(--radius-large)
-        var(--radius-large)
-        0;
-}
-
-
-.ear-right.expanded {
-    transform:
-        translate(
-            0,
-            -50%
-        );
-}
-
-
-/* =========================================================
-   Ear Handle
-
-   把手始终露在主体两侧。
-========================================================= */
-
+.ear-right.expanded { transform:translateX(0); }
+.ear-right .ear-content { border-radius:0 var(--radius-large) var(--radius-large) 0; }
 .ear-handle {
-    position: absolute;
-
-    top: 50%;
-
-    z-index: 10;
-
-    width:
-        var(--ear-handle-width);
-
-    height: 76px;
-
-    padding: 0;
-
-    border: none;
-
-    cursor: pointer;
-
-    color: white;
-
-    background:
-        linear-gradient(
-            180deg,
-            #7657e8,
-            #9b72f3
-        );
-
-    box-shadow:
-        0 8px 20px
-        rgba(80, 55, 170, 0.28);
-
-    transform:
-        translateY(-50%);
-
-    transition:
-        width var(--transition),
-        transform var(--transition);
+    position:absolute;
+    top:0;
+    z-index:5;
+    width:var(--handle-width);
+    height:var(--handle-height);
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:auto;
+    cursor:pointer;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.28);
+    background:linear-gradient(180deg,#7657e8,#9b72f3);
+    box-shadow:0 8px 20px rgba(80,55,170,.32);
+    transition:width var(--transition),box-shadow var(--transition),transform var(--transition);
 }
-
-
-.ear-handle:hover {
-    width: 42px;
-}
-
-
-/* 左耳把手 */
-
-.ear-left .ear-handle {
-    left: 100%;
-
-    border-radius:
-        0
-        14px
-        14px
-        0;
-}
-
-
-/* 右耳把手 */
-
-.ear-right .ear-handle {
-    right: 100%;
-
-    border-radius:
-        14px
-        0
-        0
-        14px;
-}
-
-
-.ear-arrow {
-    display: block;
-
-    transition:
-        transform var(--transition);
-}
-
-
-.ear-left.expanded .ear-arrow {
-    transform:
-        rotate(180deg);
-}
-
-
-.ear-right.expanded .ear-arrow {
-    transform:
-        rotate(180deg);
-}
-
+.ear-handle:hover { width:44px; box-shadow:0 12px 28px rgba(80,55,170,.48); }
+.ear-left .ear-handle { left:calc(-1 * var(--handle-width)); border-radius:14px 0 0 14px; }
+.ear-right .ear-handle { right:calc(-1 * var(--handle-width)); border-radius:0 14px 14px 0; }
+.ear-arrow { display:block; font-size:1.05rem; transition:transform var(--transition); }
+.ear-left.expanded .ear-arrow,.ear-right.expanded .ear-arrow { transform:rotate(180deg); }
 
 /* =========================================================
-   Visitor
+   Gallery
+   Handle never moves. Only gallery content slides off-screen.
 ========================================================= */
+.gallery-panel {
+    position:fixed;
+    top:var(--gallery-top,24px);
+    right:24px;
+    z-index:10;
+    width:var(--gallery-width);
+    overflow:visible;
+}
+.gallery-content {
+    width:100%;
+    max-height:calc(100vh - var(--gallery-top,24px) - 24px);
+    padding:0 16px 16px;
+    overflow-y:auto;
+    background:rgba(255,255,255,.88);
+    border:1px solid rgba(255,255,255,.75);
+    border-radius:var(--radius-large);
+    box-shadow:0 15px 45px rgba(30,20,70,.14);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    transition:transform .45s cubic-bezier(.22,.8,.25,1),opacity .25s ease;
+}
+.gallery-panel.collapsed .gallery-content {
+    transform:translateX(calc(100% + 24px));
+    opacity:0;
+    pointer-events:none;
+}
+.gallery-panel.expanded .gallery-content { transform:translateX(0); opacity:1; pointer-events:auto; }
+.gallery-handle {
+    position:absolute;
+    top:0;
+    left:calc(-1 * (var(--handle-width) + var(--side-gap)));
+    z-index:20;
+    width:var(--handle-width);
+    height:var(--handle-height);
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:var(--radius-medium) 0 0 var(--radius-medium);
+    background:linear-gradient(180deg,#7657e8,#9b72f3);
+    box-shadow:0 8px 20px rgba(80,55,170,.32);
+    transition:transform var(--transition),box-shadow var(--transition);
+}
+.gallery-handle:hover { transform:translateX(-3px); box-shadow:0 12px 28px rgba(80,55,170,.48); }
+.gallery-arrow { display:block; font-size:1.05rem; transition:transform var(--transition); }
+.gallery-panel.expanded .gallery-arrow { transform:rotate(180deg); }
+.gallery-title-bubble {
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    width:fit-content;
+    max-width:calc(100% - 8px);
+    min-height:34px;
+    margin:-15px 0 18px 8px;
+    padding:5px 16px;
+    color:#fff;
+    font-size:.88rem;
+    font-weight:700;
+    line-height:1.4;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    border-radius:999px;
+    background:linear-gradient(135deg,#7657e8,#9b72f3);
+    box-shadow:0 7px 18px rgba(90,60,180,.25);
+}
+.gallery-list { display:flex; flex-direction:column; gap:12px; }
+.gallery-empty { padding:22px 8px 8px; color:var(--text-soft); line-height:1.6; white-space:pre-line; text-align:center; }
+.gallery-item {
+    display:grid;
+    grid-template-columns:88px minmax(0,1fr);
+    gap:12px;
+    padding:10px;
+    background:rgba(255,255,255,.62);
+    border:1px solid var(--border);
+    border-radius:var(--radius-small);
+}
+.gallery-thumb { width:88px; height:68px; object-fit:cover; border-radius:10px; cursor:pointer; background:rgba(118,87,232,.12); }
+.gallery-info { min-width:0; display:flex; flex-direction:column; justify-content:center; gap:4px; }
+.gallery-name { font-weight:700; font-size:.92rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.gallery-description,.gallery-map { color:var(--text-soft); font-size:.78rem; line-height:1.45; }
+.gallery-description { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.gallery-more-link {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:58px;
+    margin-top:4px;
+    padding:12px;
+    color:var(--purple);
+    font-weight:700;
+    text-decoration:none;
+    border:1px dashed rgba(118,87,232,.45);
+    border-radius:var(--radius-small);
+    background:rgba(118,87,232,.06);
+    transition:transform var(--transition),background var(--transition);
+}
+.gallery-more-link:hover { transform:translateY(-2px); background:rgba(118,87,232,.12); }
 
+/* Visitor / footer / viewer */
 .visitor-box {
-    position: fixed;
-
-    right: 24px;
-    bottom: 24px;
-
-    z-index: 20;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 9px;
-
-    padding:
-        12px 20px;
-
-    color:
-        rgba(255, 255, 255, 0.92);
-
-    font-size:
-        0.9rem;
-
-    border:
-        1px solid
-        rgba(255, 255, 255, 0.22);
-
-    border-radius:
-        999px;
-
-    background:
-        rgba(255, 255, 255, 0.14);
-
-    backdrop-filter:
-        blur(12px);
-
-    -webkit-backdrop-filter:
-        blur(12px);
-
-    box-shadow:
-        0 10px 30px
-        rgba(20, 10, 60, 0.18);
+    position:fixed;
+    right:24px;
+    bottom:24px;
+    z-index:20;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    padding:12px 20px;
+    color:rgba(255,255,255,.92);
+    font-size:.9rem;
+    border:1px solid rgba(255,255,255,.22);
+    border-radius:999px;
+    background:rgba(255,255,255,.14);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    box-shadow:0 10px 30px rgba(20,10,60,.18);
 }
-
-
-.visitor-box strong {
-    color: white;
-
-    font-size: 1.05rem;
-}
-
+.visitor-box strong { color:#fff; font-size:1.05rem; }
+.site-footer { color:rgba(255,255,255,.72); font-size:.82rem; text-align:center; }
+.footer-dot { margin:0 8px; }
+.image-viewer { position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center; padding:30px; background:rgba(10,8,25,.86); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+.image-viewer[hidden] { display:none; }
+.image-viewer img { max-width:95vw; max-height:90vh; border-radius:var(--radius-medium); object-fit:contain; box-shadow:0 20px 80px rgba(0,0,0,.5); }
+.image-viewer-close { position:fixed; top:24px; right:28px; width:46px; height:46px; border:0; border-radius:50%; cursor:pointer; color:#fff; font-size:2rem; background:rgba(255,255,255,.16); }
 
 /* =========================================================
-   Footer
+   Responsive breakpoints
 ========================================================= */
-
-.site-footer {
-    color:
-        rgba(255, 255, 255, 0.72);
-
-    font-size:
-        0.82rem;
-
-    text-align: center;
+@media (max-width:1450px) {
+    :root { --gallery-width:300px; }
+    .gallery-panel { right:18px; }
 }
-
-
-.footer-dot {
-    margin:
-        0 8px;
+@media (max-width:1280px) {
+    :root { --ear-width:220px; --gallery-width:280px; }
+    /* Gallery is intentionally removed before it can overlap the central layout. */
+    .gallery-panel { display:none; }
 }
-
-
-/* =========================================================
-   Image Viewer
-========================================================= */
-
-.image-viewer {
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 100;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    padding: 30px;
-
-    background:
-        rgba(10, 8, 25, 0.86);
-
-    backdrop-filter:
-        blur(10px);
-
-    -webkit-backdrop-filter:
-        blur(10px);
+@media (max-width:1100px) {
+    :root { --ear-width:190px; --main-content-width:700px; }
 }
-
-
-.image-viewer[hidden] {
-    display: none;
+/* At this point even collapsed ear controls would compete with a readable main panel. */
+@media (max-width:900px) {
+    .site-shell { padding:28px 12px 30px; }
+    .profile-panel { padding:32px 22px 30px; }
+    .information-shell { width:100%; }
+    .information-main { padding:22px; }
+    .ear,.gallery-panel { display:none !important; }
 }
-
-
-.image-viewer img {
-    max-width: 95vw;
-    max-height: 90vh;
-
-    border-radius:
-        var(--radius-medium);
-
-    object-fit: contain;
-
-    box-shadow:
-        0 20px 80px
-        rgba(0, 0, 0, 0.5);
-}
-
-
-.image-viewer-close {
-    position: fixed;
-
-    top: 24px;
-    right: 28px;
-
-    width: 46px;
-    height: 46px;
-
-    border: none;
-
-    border-radius: 50%;
-
-    cursor: pointer;
-
-    color: white;
-
-    font-size: 2rem;
-
-    background:
-        rgba(255, 255, 255, 0.16);
-}
-
-
-/* =========================================================
-   Tablet
-========================================================= */
-
-@media (max-width: 1100px) {
-
-    /*
-        当屏幕不够宽时，
-        耳朵仍然存在，
-        但宽度缩小。
-    */
-
-    :root {
-        --ear-width: 210px;
-    }
-
-}
-
-
-/* =========================================================
-   Mobile
-========================================================= */
-
-@media (max-width: 900px) {
-
-    .site-shell {
-        padding:
-            28px 12px
-            30px;
-    }
-
-
-    .profile-panel {
-        padding:
-            32px
-            22px
-            30px;
-    }
-
-
-    .information-main {
-        padding: 22px;
-    }
-
-
-    /*
-        手机端不使用横向耳朵，
-        避免把主体挤到无法阅读。
-
-        JS 会把左右卡片复制到中间。
-    */
-
-    .ear {
-        display: none !important;
-    }
-
-
-    .information-shell {
-        width: 100%;
-    }
-
-}
-
-
-/* =========================================================
-   Small Mobile
-========================================================= */
-
-@media (max-width: 520px) {
-
-    .display-name {
-        font-size: 2rem;
-    }
-
-
-    .avatar-button {
-        width: 112px;
-        height: 112px;
-    }
-
-
-    .about-section {
-        padding:
-            34px 20px
-            22px;
-    }
-
-
-    .information-main {
-        padding: 18px;
-    }
-
-
-    .info-card {
-        padding:
-            32px 18px
-            20px;
-    }
-
-
-    .visitor-box {
-        right: 14px;
-        bottom: 14px;
-
-        padding:
-            10px 16px;
-
-        font-size:
-            0.82rem;
-    }
-
+@media (max-width:520px) {
+    .display-name { font-size:2rem; }
+    .avatar-button { width:112px; height:112px; }
+    .about-section { padding:34px 20px 22px; }
+    .information-main { padding:18px; }
+    .info-card { padding:0 18px 20px; }
+    .visitor-box { right:14px; bottom:14px; padding:10px 16px; font-size:.82rem; }
 }
