@@ -75,7 +75,7 @@ const dom = {
 
     galleryPanel:
         document.getElementById("galleryPanel"),
-
+   
     galleryToggle:
         document.getElementById("galleryToggle"),
    
@@ -157,9 +157,9 @@ document.addEventListener(
     async () => {
 
         setupEarControls();
-      
+
         setupGalleryControls();
-      
+
         setupImageViewer();
 
         await loadWebsite();
@@ -1017,7 +1017,7 @@ function renderGallery() {
 }
 
 /* =========================================================
-   Gallery Controls + Position
+   Gallery Controls
 ========================================================= */
 
 function setupGalleryControls() {
@@ -1029,10 +1029,12 @@ function setupGalleryControls() {
         return;
     }
 
+
     const savedState =
         localStorage.getItem(
             "vrc_site_gallery"
         );
+
 
     if (
         savedState === "expanded"
@@ -1063,24 +1065,18 @@ function setupGalleryControls() {
                 const expanded =
                     dom.galleryPanel
                         .classList
-                        .contains(
-                            "expanded"
-                        );
+                        .contains("expanded");
 
 
                 if (expanded) {
 
                     dom.galleryPanel
                         .classList
-                        .remove(
-                            "expanded"
-                        );
+                        .remove("expanded");
 
                     dom.galleryPanel
                         .classList
-                        .add(
-                            "collapsed"
-                        );
+                        .add("collapsed");
 
                     dom.galleryToggle
                         .setAttribute(
@@ -1098,15 +1094,11 @@ function setupGalleryControls() {
 
                     dom.galleryPanel
                         .classList
-                        .remove(
-                            "collapsed"
-                        );
+                        .remove("collapsed");
 
                     dom.galleryPanel
                         .classList
-                        .add(
-                            "expanded"
-                        );
+                        .add("expanded");
 
                     dom.galleryToggle
                         .setAttribute(
@@ -1127,20 +1119,10 @@ function setupGalleryControls() {
 }
 
 
-/*
-   画廊初始位置：
-   第二主框顶部。
+/* =========================================================
+   Gallery Position
+========================================================= */
 
-   用户向下滚动时：
-   第二主框顶部逐渐离开屏幕，
-   画廊跟着向上移动。
-
-   到达浏览器顶部安全距离后：
-   不再继续上移。
-
-   这样就是你说的：
-   "下面自动上滑，但始终留在用户界面内"
-*/
 function updateGalleryPosition() {
 
     if (
@@ -1156,9 +1138,21 @@ function updateGalleryPosition() {
             .getBoundingClientRect();
 
 
+    /*
+        限位：
+
+        初始位置 = 第二主框顶部
+
+        向下滚动后：
+        画廊跟着上移
+
+        最高不会超过视口顶部 24px
+    */
+
     const safeTop = 24;
 
-    const galleryTop =
+
+    const top =
         Math.max(
             safeTop,
             rect.top
@@ -1169,7 +1163,7 @@ function updateGalleryPosition() {
         .style
         .setProperty(
             "--gallery-top",
-            `${galleryTop}px`
+            `${top}px`
         );
 
 }
