@@ -5,7 +5,8 @@
 const state = {
     profile: null,
     appearance: null,
-    cards: []
+    cards: [],
+    gallery: []
 };
 
 
@@ -70,7 +71,19 @@ const dom = {
         document.getElementById("viewerImage"),
 
     closeImageViewer:
-        document.getElementById("closeImageViewer")
+        document.getElementById("closeImageViewer"),
+
+    galleryPanel:
+        document.getElementById("galleryPanel"),
+   
+    galleryToggle:
+        document.getElementById("galleryToggle"),
+   
+    galleryList:
+        document.getElementById("galleryList"),
+
+    informationShell:
+        document.getElementById("informationShell")
 
 };
 
@@ -145,6 +158,8 @@ document.addEventListener(
 
         setupEarControls();
 
+        setupGalleryControls();
+
         setupImageViewer();
 
         await loadWebsite();
@@ -166,7 +181,8 @@ async function loadWebsite() {
         const [
             profileResult,
             appearanceResult,
-            cardsResult
+            cardsResult,
+            galleryResult
         ] = await Promise.all([
 
             supabaseClient
@@ -184,12 +200,13 @@ async function loadWebsite() {
             supabaseClient
                 .from("info_cards")
                 .select("*")
-                .order(
-                    "sort_order",
-                    {
-                        ascending: true
-                    }
-                )
+                .order("sort_order", { ascending: true }),
+
+            supabaseClient
+                .from("gallery_items")
+                .select("*")
+                .order("sort_order", { ascending: true })
+                .limit(5)
 
         ]);
 
@@ -208,12 +225,20 @@ async function loadWebsite() {
             cardsResult.data ||
             [];
 
+        state.gallery =
+            galleryResult.data ||
+            [];
+
 
         renderProfile();
 
         renderAppearance();
 
         renderCards();
+
+        renderGallery();
+
+        updateGalleryPosition();
 
     }
     catch (error) {
@@ -234,12 +259,18 @@ async function loadWebsite() {
 
         state.cards = [];
 
+        state.gallery = [];
+
 
         renderProfile();
 
         renderAppearance();
 
         renderCards();
+
+        renderGallery();
+
+        updateGalleryPosition();
 
     }
 
@@ -699,119 +730,32 @@ function createCard(card) {
 ========================================================= */
 
 function setupEarControls() {
+    const ears = [
+        [dom.leftEar, dom.leftEarToggle, "vrc_site_left_ear"],
+        [dom.rightEar, dom.rightEarToggle, "vrc_site_right_ear"]
+    ];
 
-    const leftState =
-        localStorage.getItem(
-            "vrc_site_left_ear"
-        );
+    ears.forEach(([ear, toggle, key]) => {
+        if (!ear || !toggle) return;
 
+        const expanded = localStorage.getItem(key) === "expanded";
+        setEarState(ear, expanded, key, false);
 
-    const rightState =
-        localStorage.getItem(
-            "vrc_site_right_ear"
-        );
-
-
-    if (
-        leftState ===
-        "expanded"
-    ) {
-
-        dom.leftEar
-            .classList
-            .add("expanded");
-
-    }
-
-
-    if (
-        rightState ===
-        "expanded"
-    ) {
-
-        dom.rightEar
-            .classList
-            .add("expanded");
-
-    }
-
-
-    dom.leftEarToggle.addEventListener(
-        "click",
-        () => {
-
-            toggleEar(
-                dom.leftEar,
-                "vrc_site_left_ear"
-            );
-
-        }
-    );
-
-
-    dom.rightEarToggle.addEventListener(
-        "click",
-        () => {
-
-            toggleEar(
-                dom.rightEar,
-                "vrc_site_right_ear"
-            );
-
-        }
-    );
-
+        toggle.addEventListener("click", () => {
+            setEarState(ear, !ear.classList.contains("expanded"), key, true);
+        });
+    });
 }
 
+function setEarState(ear, expanded, key, persist = true) {
+    ear.classList.toggle("expanded", expanded);
+    ear.classList.toggle("collapsed", !expanded);
 
-/* =========================================================
-   Toggle Ear
-========================================================= */
+    const handle = ear.querySelector(".ear-handle");
+    if (handle) handle.setAttribute("aria-expanded", String(expanded));
 
-function toggleEar(
-    ear,
-    storageKey
-) {
-
-    const expanded =
-        ear.classList.contains(
-            "expanded"
-        );
-
-
-    if (expanded) {
-
-        ear
-            .classList
-            .remove(
-                "expanded"
-            );
-
-
-        localStorage.setItem(
-            storageKey,
-            "collapsed"
-        );
-
-    }
-    else {
-
-        ear
-            .classList
-            .add(
-                "expanded"
-            );
-
-
-        localStorage.setItem(
-            storageKey,
-            "expanded"
-        );
-
-    }
-
+    if (persist) localStorage.setItem(key, expanded ? "expanded" : "collapsed");
 }
-
 
 /* =========================================================
    Mobile Cards
@@ -920,6 +864,250 @@ function closeImageViewer() {
         true;
 
 }
+
+
+/* =========================================================
+   Gallery
+========================================================= */
+
+function renderGallery() {
+    if (!dom.galleryList) return;
+
+    dom.galleryList.innerHTML = "";
+
+    const items = (state.gallery || []).slice(0, 5);
+
+    if (!items.length) {
+        const empty = document.createElement("div");
+        empty.className = "gallery-empty";
+        empty.textContent = "暂无图片\n以后可以在管理后台添加。";
+        dom.galleryList.appendChild(empty);
+
+        const more = document.createElement("a");
+        more.className = "gallery-more-link";
+        more.href = "#";
+        more.textContent = "完整画廊入口（筹备中）";
+        more.addEventListener("click", event => event.preventDefault());
+        dom.galleryList.appendChild(more);
+        return;
+    }
+
+    items.forEach(item => {
+        const article = document.createElement("article");
+        article.className = "gallery-item";
+
+        const img = document.createElement("img");
+        img.className = "gallery-thumb";
+        img.src = item.image_url || "";
+        img.alt = item.name || "Gallery image";
+        img.loading = "lazy";
+        img.addEventListener("click", () => {
+            if (!item.image_url) return;
+            dom.viewerImage.src = item.image_url;
+            dom.imageViewer.hidden = false;
+        });
+
+        const info = document.createElement("div");
+        info.className = "gallery-info";
+
+        const name = document.createElement("div");
+        name.className = "gallery-name";
+        name.textContent = item.name || "未命名图片";
+
+        const description = document.createElement("div");
+        description.className = "gallery-description";
+        description.textContent = item.description || "暂无描述";
+
+        const map = document.createElement("div");
+        map.className = "gallery-map";
+        map.textContent = item.map_name || "未标注地图";
+
+        info.append(name, description, map);
+        article.append(img, info);
+        dom.galleryList.appendChild(article);
+    });
+
+    const more = document.createElement("a");
+    more.className = "gallery-more-link";
+    more.href = "#";
+    more.textContent = "更多图片 · 完整画廊（筹备中）";
+    more.addEventListener("click", event => event.preventDefault());
+    dom.galleryList.appendChild(more);
+}
+
+/* =========================================================
+   Gallery Controls
+========================================================= */
+
+function setupGalleryControls() {
+
+    if (
+        !dom.galleryPanel ||
+        !dom.galleryToggle
+    ) {
+        return;
+    }
+
+
+    const savedState =
+        localStorage.getItem(
+            "vrc_site_gallery"
+        );
+
+
+    if (
+        savedState === "expanded"
+    ) {
+
+        dom.galleryPanel
+            .classList
+            .remove("collapsed");
+
+        dom.galleryPanel
+            .classList
+            .add("expanded");
+
+        dom.galleryToggle
+            .setAttribute(
+                "aria-expanded",
+                "true"
+            );
+
+    }
+
+
+    dom.galleryToggle
+        .addEventListener(
+            "click",
+            () => {
+
+                const expanded =
+                    dom.galleryPanel
+                        .classList
+                        .contains("expanded");
+
+
+                if (expanded) {
+
+                    dom.galleryPanel
+                        .classList
+                        .remove("expanded");
+
+                    dom.galleryPanel
+                        .classList
+                        .add("collapsed");
+
+                    dom.galleryToggle
+                        .setAttribute(
+                            "aria-expanded",
+                            "false"
+                        );
+
+                    localStorage.setItem(
+                        "vrc_site_gallery",
+                        "collapsed"
+                    );
+
+                }
+                else {
+
+                    dom.galleryPanel
+                        .classList
+                        .remove("collapsed");
+
+                    dom.galleryPanel
+                        .classList
+                        .add("expanded");
+
+                    dom.galleryToggle
+                        .setAttribute(
+                            "aria-expanded",
+                            "true"
+                        );
+
+                    localStorage.setItem(
+                        "vrc_site_gallery",
+                        "expanded"
+                    );
+
+                }
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   Gallery Position
+========================================================= */
+
+function updateGalleryPosition() {
+
+    if (
+        !dom.galleryPanel ||
+        !dom.informationShell
+    ) {
+        return;
+    }
+
+
+    const rect =
+        dom.informationShell
+            .getBoundingClientRect();
+
+
+    /*
+        限位：
+
+        初始位置 = 第二主框顶部
+
+        向下滚动后：
+        画廊跟着上移
+
+        最高不会超过视口顶部 24px
+    */
+
+    const safeTop = 24;
+
+
+    const top =
+        Math.max(
+            safeTop,
+            rect.top
+        );
+
+
+    document.documentElement
+        .style
+        .setProperty(
+            "--gallery-top",
+            `${top}px`
+        );
+
+}
+
+
+window.addEventListener(
+    "scroll",
+    updateGalleryPosition,
+    {
+        passive: true
+    }
+);
+
+
+let mobileLayoutActive = window.innerWidth <= 900;
+
+window.addEventListener("resize", () => {
+    updateGalleryPosition();
+
+    const nextMobileState = window.innerWidth <= 900;
+    if (nextMobileState !== mobileLayoutActive) {
+        mobileLayoutActive = nextMobileState;
+        renderCards();
+    }
+});
 
 
 /* =========================================================
